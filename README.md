@@ -19,40 +19,29 @@ Enter the folder and create a subfolder "Work" where you will be running the exe
 
 ## Data
 
-We will use some example data sets:
+As an illustration, we will use 60 BAM files of human samples (of African, European, and Native American descent), a reference genome, and putative ancestral sequence.
+The human data represents a small genomic region (1MB on chromosome 11) extracted from the 1000 Genomes Project data set.
+More information on this project can be found [here](http://www.1000genomes.org/), including their last publication available [here](http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html).
+The human reference sequence can be found [here](ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/).
 
- - Raw reads data of **chipmunks** (optional) are from [this](http://www.ncbi.nlm.nih.gov/pubmed/24118668) paper, and are kindly provided by Tyler Linderoth and Ke Bi.
-In this paper, Authors sequenced around 4Mbp from early 20th century samples. We will use a very small subset of the original dataset.
-
- - BAM files of **butterflies** are a small sample subset of the original study and we will analyse around 1 Mbp.
-More information about the original aligned files can be obtained at the original paper [here](http://www.ncbi.nlm.nih.gov/pubmed/22759293).
-In this study, authors analysed a butterfly Next-Generation Sequencing dataset sequenced using Illumina GAII technology.
-The dataset consists of a total of 381 samples of Lycaeides idas, Lycaeides melissa and an hybrid collection (Jackson Hole).
-DNA resequencing was conducted on custom reduced genomic complexity libraries (RAD-seq).
-We will analysed only a subset of 20 samples.
-
- - Other BAM files that will be used are a subset of **human** sequencing data from the 1000 Genomes Project.
-More information on this project can be found [here](http://www.1000genomes.org/).
-This dataset comprises 33 individuals of European descent.
-
- - Genotype likelihoods from inbred samples (optional) will be generated on-the-run.
+Additional scripts will be provided.
 
 ## Agenda
 
 ### Lecture:
 
-* SNP and genotype calling
-* Estimation of summary statistics from NGS data
+* Basics of data handling and filtering
+* SNPs and genotypes calling
+* Estimation of summary statistics from low-depth data
 * Paper discussion
 
 ### Practical
 
-* SNP and genotype calling using ANGSD
-* Advanced methods to estimate SFS and summary statistics
-* Additional material:
-	+ Basic data filtering
-	+ Dealing with inbred sample
-	+ Population structure and admixture from low-depth data
+* Basic filtering of sites [.](https://github.com/mfumagalli/WoodsHole/blob/master/Files/filtering.md)
+* Estimation of allele frequencies and SNP calling [.](https://github.com/mfumagalli/WoodsHole/blob/master/Files/snpcall.md)
+* Genotype calling [.](https://github.com/mfumagalli/WoodsHole/blob/master/Files/genocall.md)
+* Advanced methods to estimate SFS and summary statistics [.](https://github.com/mfumagalli/WoodsHole/blob/master/Files/sfs.md)
+* Exercise: identification of allele frequency differentation between, with admixture assessment and quantification, from low-depth data: the case of FADS genetic variation in Native Americans
 
 ## Credits
 

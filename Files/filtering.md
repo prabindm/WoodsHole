@@ -13,6 +13,7 @@ More information about its rationale and implemented methods can be found [here]
 As an illustration, we will use 60 BAM files of human samples (of African, European, and Native American descent), a reference genome, and putative ancestral sequence.
 The human data represents a small genomic region (1MB on chromosome 11) extracted from the 1000 Genomes Project data set.
 More information on this project can be found [here](http://www.1000genomes.org/), including their last publication available [here](http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html).
+The human reference sequence can be found [here](ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/).
 
 ## Preparation
 
@@ -26,7 +27,7 @@ NGSTOOLS=/data/Software/ngsTools
 NGSADMIX=/data/data/Software/NGSadmix/NGSadmix
 FASTME=/data/data/Software/fastme-2.1.4/src/fastme
 
-REF=/data/data/hg19/chr11.fa
+REF=Data/hs37d5.fa.gz
 ANC=Data/hg19ancNoChr.fa.gz
 ```
 
@@ -88,7 +89,6 @@ ANGSD can accept several input files, as described [here](http://popgen.dk/angsd
 
 #### Basic filtering post-mapping
 
-
 Here we show how ANGSD can also perform some basic filtering of the data.
 These filters are based on:
 
@@ -107,7 +107,7 @@ parseArgs_bambi.cpp: bam reader:
 	-r		(null)	Supply a single region in commandline (see examples below)
 	-rf		(null)	Supply multiple regions in a file (see examples below)
 	-remove_bads	1	Discard 'bad' reads, (flag >=256) 
-	-uniqueOnly	0	Discards reads that doesn't map uniquely
+	-uniqueOnly	0	Discards reads that doesnt map uniquely
 	-show		0	Mimic 'samtools mpileup' also supply -ref fasta for printing reference column
 	-minMapQ	0	Discard reads with mapping quality below
 	-minQ		13	Discard bases with base quality below
@@ -132,16 +132,84 @@ Examples for region specification:
 
 Some basic filtering consists in removing, for instance, read with low quality and/or with multiple hits, and this can be achieved using the parameters ```-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1```.
 
+Also, you may want to remove reads with low mapping quality and sites with low quality or covered by few reads (low depth).
+Under these circumnstances, the assignment of individual genotypes and SNPs is problematics, and can lead to errors. 
 
-
+However, it is necessary to know the overall distribution of per-site depth, in order to avoid filtering too many sites.
+We first derive the distribution of quality scores and depth on our data set using ```-doQsDist 1 -doDepth 1```.
 
 ```
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL.qc \
+$ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL.qc \
         -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
         -doQsDist 1 -doDepth 1 -doCounts 1 -maxDepth 1200
 ```
 
-As an illustration here, -maxDepth 1200 corresponds to a per-sample average depth of 20. 
+As an illustration here, ```-maxDepth 1200``` corresponds to a per-sample average depth of 20.
+This option means that all sites with depth equal or greater than 1200 will be binned together.
+
+Have a look at the files generated:
+```
+...
+-> Output filenames:
+		->"Results/ALL.qc.arg"
+		->"Results/ALL.qc.qs"
+		->"Results/ALL.qc.depthSample"
+		->"Results/ALL.qc.depthGlobal"
+...
+```
+```
+# counts of quality scores
+less -S Results/ALL.qc.qs
+# counts of per-sample depth
+less -S Results/ALL.qc.depthSample 
+wc -l Results/ALL.qc.depthSample # 60 Results/ALL.qc.depthSample
+# counts of global depth
+less -S Results/ALL.qc.depthGlobal 
+```
+
+It is convenient to compute the percentiles of these distributions (and visualize them) in order to make an informative decision on the threshold values we will use for our filtering.
+
+```
+Rscript Scripts/plotQC.R Results/ALL.qc 2> /dev/null
+```
+Have a look at the output files:
+```
+less -S Results/ALL.qc.info
+evince Results/ALL.qc.pdf
+``` 
+
+Which values would you choose as sensible thresholds on quality score and global depth (min and max)?
+
+---------------------
+
+ANGSD can also compute more sophisticated metrics to filter out SNPs, as described [here](http://popgen.dk/angsd/index.php/SnpFilters), mostly based on:
+
+* strand bias
+* deviation from HWE
+* quality score bias
+
+These options are still under development and thus they will not be used during this session.
+As a general guideline, a typical command line to report SNP statistics is:
+
+```
+$ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
+        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+	-doMaf 1 -doMajorMinor 1 -GL 1 -SNP_pval 1e-2 -hwe_pval 1 -doSnpStat 1
+```
+
+The output files are:
+```
+less -S Results/ALL.hwe.gz
+less -S Results/ALL.snpStat.gz
+```
+
+----------------------------
+
+OPTIONAL
+
+Perform a population-specific filtering with HWE-filter too.
+Then retain the overlapping sites.
+
 
 
 ----------------------------
