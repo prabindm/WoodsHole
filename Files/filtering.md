@@ -1,15 +1,14 @@
 
 **WORKFLOW**:
 
-MAPPED DATA > SNP CALLING
+MAPPED DATA > FILTERING
 
-In this section, we will go through some examples on how to assign variable sites from BAM files, once the data has been filtered.
-We will show how to call SNPs with different methods, and we will compare their results.
+In this section, we will show how to perform a basic filtering of sites, after the reads have been mapped or aligned.
 
-We will mainly use the program [ANGSD](http://popgen.dk/wiki/index.php/ANGSD) (Analysis of Next Generation Sequencing Data) developed by Thorfinn Korneliussen and Anders Albrechtsen at the University of Copenhagen. 
+For most of the examples, we will use the program [ANGSD](http://popgen.dk/wiki/index.php/ANGSD) (Analysis of Next Generation Sequencing Data) developed by Thorfinn Korneliussen and Anders Albrechtsen at the University of Copenhagen. 
 More information about its rationale and implemented methods can be found [here](http://www.ncbi.nlm.nih.gov/pubmed/25420514).
 
-We will also utilise the widely-used SAMtools at some point.
+## Data
 
 As an illustration, we will use 60 BAM files of human samples (of African, European, and Native American descent), a reference genome, and putative ancestral sequence.
 The human data represents a small genomic region (1MB on chromosome 11) extracted from the 1000 Genomes Project data set.
@@ -35,8 +34,6 @@ Create a folder for results.
 ```
 mkdir Results
 ```
-
-### Estimating allele frequencies and calling SNPs
 
 #### ANGSD
 
@@ -80,11 +77,63 @@ Examples:
 		'./angsd -bam list -GL 2 -doMaf 2 -out RES -doMajorMinor 1'
 ```
 
-ANGSD can also perform some basic filtering of the data, as described [here](http://www.popgen.dk/angsd/index.php/Filters). 
+We will see later of to perform SNP and genotype calling (and many other things) with ANGSD.
 
--------------
+ANGSD can accept several input files, as described [here](http://popgen.dk/angsd/index.php/Input):
 
-## Basic filtering post-mapping
+* BAM/CRAM
+* Pileup
+* Genotype likelihood/probability files
+* VCF
+
+#### Basic filtering post-mapping
+
+
+Here we show how ANGSD can also perform some basic filtering of the data.
+These filters are based on:
+
+* quality and depth, see [here](http://www.popgen.dk/angsd/index.php/Filters)
+* SNP quality, see [here](http://popgen.dk/angsd/index.php/SnpFilters)
+* sites, see [here](http://popgen.dk/angsd/index.php/Sites)
+
+If the input file is in BAM format, the possible options are:
+```
+$ANGSD/angsd -bam
+...
+---------------
+parseArgs_bambi.cpp: bam reader:
+	-bam/-b		(null)	(list of BAM/CRAM files)
+	-i		(null)	(Single BAM/CRAM file)
+	-r		(null)	Supply a single region in commandline (see examples below)
+	-rf		(null)	Supply multiple regions in a file (see examples below)
+	-remove_bads	1	Discard 'bad' reads, (flag >=256) 
+	-uniqueOnly	0	Discards reads that doesn't map uniquely
+	-show		0	Mimic 'samtools mpileup' also supply -ref fasta for printing reference column
+	-minMapQ	0	Discard reads with mapping quality below
+	-minQ		13	Discard bases with base quality below
+	-trim		0	Number of based to discard at both ends of the reads
+	-only_proper_pairs 1	Only use reads where the mate could be mapped
+	-C		0	adjust mapQ for excessive mismatches (as SAMtools), supply -ref
+	-baq		0	adjust qscores around indels (as SAMtools), supply -ref
+	-checkBamHeaders 1	Exit if difference in BAM headers
+	-doCheck	1	Keep going even if datafile is not suffixed with .bam/.cram
+	-downSample	0.000000	Downsample to the fraction of original data
+	-nReads		50	Number of reads to pop from each BAM/CRAMs
+	-minChunkSize	250	Minimum size of chunk sent to analyses
+
+Examples for region specification:
+		chr:		Use entire chromosome: chr
+		chr:start-	Use region from start to end of chr
+		chr:-stop	Use region from beginning of chromosome: chr to stop
+		chr:start-stop	Use region from start to stop from chromosome: chr
+		chr:site	Use single site on chromosome: chr
+```
+
+
+Some basic filtering consists in removing, for instance, read with low quality and/or with multiple hits, and this can be achieved using the parameters ```-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1```.
+
+
+
 
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL.qc \
@@ -96,159 +145,3 @@ As an illustration here, -maxDepth 1200 corresponds to a per-sample average dept
 
 
 ----------------------------
-
-
-As a first step we want to estimate **allele frequencies**:
-
-```
-ngsTools/angsd/angsd -doMaf
-...
--doMaf	0 (Calculate persite frequencies '.mafs.gz')
-	1: Frequency (fixed major and minor)
-	2: Frequency (fixed major unknown minor)
-	4: Frequency from genotype probabilities
-	8: AlleleCounts based method (known major minor)
-	NB. Filedumping is supressed if value is negative
-...
-```
-
-Therefore our command line could be:
-```
-ngsTools/angsd/angsd sites index input/lyca/sites.angsd.bed # to index file with sites to keep
-ngsTools/angsd/angsd -b input/lyca/bams.list -GL 1 -doMajorMinor 1 -doMaf 2 -sites input/lyca/sites.angsd.bed -out output/lyca
-```
-Results are stored in the `output/` folder. 
-
-Which are the output files?
-```
-output/lyca.arg
-output/lyca.mafs.gz
-```
-`.args` file is a summary of all options used, while `.mafs.gz` file shows the allele frequencies computed at each site.
-
-We can have a look at the estimated **Minor Allele Frequency** (MAF) data:
-```
-gunzip -c output/lyca.mafs.gz | head
-```
-and you should see something like
-```
-chromo	position	major	minor	unknownEM	nInd
-ref_contig	126	T	A	0.000000	20
-ref_contig	129	A	C	0.000000	20
-ref_contig	131	C	A	0.000000	20
-ref_contig	133	T	C	0.000000	20
-ref_contig	135	A	C	0.000000	20
-ref_contig	136	T	A	0.000000	20
-ref_contig	138	C	A	0.000000	20
-ref_contig	139	A	C	0.000000	20
-ref_contig	141	T	A	0.000000	20
-```
-for a total of
-```
-gunzip -c output/lyca.mafs.gz | tail -n+2 | wc -l
-   99196
-```
-sites.
-
-The first and second column indicate the position of each site, then we have major and minor alleles (based on the reference sequence), the estimated allele frequency, and the number of samples with data.
-
-To generate this file we used some options in ANGSD, `-GL 1 -doMajorMinor 1 -doMaf 2`. 
-What do they mean? 
-
-Let us check the online help:
-```
-ngsTools/angsd/angsd -GL
-	...	
-	-GL=0: 
-	1: SAMtools
-	2: GATK
-	3: SOAPsnp
-	...
-```
-This means that with `-GL` you can control how to compute genotype likelihoods, which method to use.
-
-```
-ngsTools/angsd/angsd -doMajorMinor
-	...
-	-doMajorMinor	0
-	1: Infer major and minor from GL
-	2: Infer major and minor from allele counts
-	3: use major and minor from a file (requires -sites file.txt)
-	4: Use reference allele as major (requires -ref)
-	5: Use ancestral allele as major (requires -anc)
-	-skipTriallelic	0
-	...
-```
-With -doMajorMinor you can set how to define the 2 allelic states.
-
-```
-ngsTools/angsd/angsd -doMaf
-	...
-	-doMaf	0 (Calculate persite frequencies '.mafs.gz')
-	1: Frequency (fixed major and minor)
-	2: Frequency (fixed major unknown minor)
-	4: Frequency from genotype probabilities
-	8: AlleleCounts based method (known major minor)
-	NB. Filedumping is supressed if value is negative
-	...
-```
-With `-doMaf` you can choose the method to estimate allele frequencies.
-Please note that you can even combine different methods in the same output by simply adding the `-doMaf` parameters.
-Explanations of these methods can be found [here](http://popgen.dk/angsd/index.php/Allele_Frequency_estimation).
-
---------
-
-We may be interested in looking at allele frequencies only for sites that are actually variable in our sample. 
-Therefore we want to perform a **SNP calling**. 
-There are several ways to call SNPs using ANGSD, for instance by using these options:
-```
-	-minMaf  	0.000000	(Remove sites with MAF below)
-	-SNP_pval	1.000000	(Remove sites with a pvalue larger)
-```
-Therefore we can consider assigning as SNPs sites whose estimated allele frequency is above a certain threhsold (e.g. the frequency of a singleton) or whose probability of being variable is above a specified value.
-
-As an illustration, let us call SNPs by computing:
- - genotype likelihoods using GATK method;
- - major and minor alleles from allele counts (you need to specify -doCounts 1);
- - frequency from known major allele;
- - SNPs as those having MAF>0.05.
-
-The command line is:
-```
-ngsTools/angsd/angsd -b input/lyca/bams.list -sites input/lyca/sites.angsd.bed -GL 2 -doMajorMinor 2 -doMaf 1 -minMaf 0.05 -doCounts 1 -out output/lyca
-```
-Please note that not all the combinations of parameters are possible, since they might be in conflict or require additional steps or flags.
-
-You can have a look at the results:
-```
-gunzip -c output/lyca.mafs.gz | less
-
- chromo  position        major   minor   knownEM nInd
- ref_contig      153     A       T       0.180146        20
- ref_contig      199     G       A       0.156008        20
- ref_contig      213     A       G       0.127374        20
- ref_contig      275     A       T       0.178517        20
- ref_contig      321     G       A       0.157150        20
- ...
-```
-
-As a general guidance, `-GL 1`, `-doMaf 1/2` and `-doMajorMinor 1` should be the preferred choice when data uncertainty is high.
-For accurate and recalibrate data users can choose `-GL 2` as well.
-If interested in analyzing very low frequency SNPs, then `-doMaf 2` should be selected.
-When accurate information on reference sequence or outgroup are available, one can use `-doMajorMinor` to 4 or 5.
-Also, detecting variable sites based on their probability of being SNPs is generally a better choice than defining a threshold on the allele frequency. 
-However, various cutoffs and a dedicated filtering should be perform to assess robustenss of your called SNPs.
-
-**EXERCISE**
-Estimate allele frequencies and call SNPs using the example dataset (or your own) using ANGSD.
-Try varying the cutoff for SNP calling and record how many sites are predicted to be variable for each scenario.
-Identify which sites are not predicted to be variable anymore with a more stringent cutoff (e.g. between a pair of scenario), and plot their allele frequencies.
-A possible **SOLUTION** for this exercise is given [here](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/solutions.txt).
-
-**ADDITIONAL MATERIAL**
-Command lines for SNP calling using SAMtools, and comparison with ANGSD, are given [here](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/snpcall_samtools.txt).
-
-
-
-
-
