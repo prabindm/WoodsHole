@@ -179,6 +179,21 @@ evince Results/ALL.qc.pdf
 ``` 
 
 Which values would you choose as sensible thresholds on quality score and global depth (min and max)?
+We may also want to remove sites where half of the individual have no data. This is achieved by the -minInd option.
+A possible command line would contain the following filtering:
+```
+...
+        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+...
+```
+which corresponds to the following scenario:
+Parameter | Meaning
+--------- | -------
+-minInd 30 | use only sites with data from at least N individuals
+-setMinDepth 210 | minimum total depth
+-setMaxDepth 700 | minimum total depth
+
 
 ---------------------
 

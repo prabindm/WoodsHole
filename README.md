@@ -37,11 +37,11 @@ Additional scripts will be provided.
 
 ### Practical
 
-* Basic filtering of sites [.](https://github.com/mfumagalli/WoodsHole/blob/master/Files/filtering.md)
-* Estimation of allele frequencies and SNP calling [.](https://github.com/mfumagalli/WoodsHole/blob/master/Files/snpcall.md)
-* Genotype calling [.](https://github.com/mfumagalli/WoodsHole/blob/master/Files/genocall.md)
-* Advanced methods to estimate SFS and summary statistics [.](https://github.com/mfumagalli/WoodsHole/blob/master/Files/sfs.md)
-* Exercise: identification of allele frequency differentation between, with admixture assessment and quantification, from low-depth data: the case of FADS genetic variation in Native Americans
+* Basic [filtering](https://github.com/mfumagalli/WoodsHole/blob/master/Files/filtering.md)
+* Estimation of allele frequencies and [SNP calling](https://github.com/mfumagalli/WoodsHole/blob/master/Files/snpcall.md)
+* [Genotype calling](https://github.com/mfumagalli/WoodsHole/blob/master/Files/genocall.md)
+* Advanced methods to estimate [SFS](https://github.com/mfumagalli/WoodsHole/blob/master/Files/sfs.md)
+* [Exercise]((https://github.com/mfumagalli/WoodsHole/blob/master/Files/fads.md)): identification of allele frequency differentation between, with admixture assessment and quantification, from low-depth data: the case of FADS genetic variation in Native Americans
 
 ## Credits
 
