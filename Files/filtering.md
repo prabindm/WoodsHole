@@ -194,7 +194,6 @@ Parameter | Meaning
 -setMinDepth 210 | minimum total depth
 -setMaxDepth 700 | minimum total depth
 
-
 ---------------------
 
 ANGSD can also compute more sophisticated metrics to filter out SNPs, as described [here](http://popgen.dk/angsd/index.php/SnpFilters), mostly based on:
@@ -204,11 +203,13 @@ ANGSD can also compute more sophisticated metrics to filter out SNPs, as describ
 * quality score bias
 
 These options are still under development and thus they will not be used during this session.
+Furthermore, since our global sample is a mix of populations, the HWE filtering is not appropriate.
 As a general guideline, a typical command line to report SNP statistics is:
 
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
         -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
 	-doMaf 1 -doMajorMinor 1 -GL 1 -SNP_pval 1e-2 -hwe_pval 1 -doSnpStat 1
 ```
 
@@ -220,11 +221,37 @@ less -S Results/ALL.snpStat.gz
 
 ----------------------------
 
-OPTIONAL
+OPTIONAL - DO NOT RUN
 
-Perform a population-specific filtering with HWE-filter too.
-Then retain the overlapping sites.
+After we made our filtering choices we can extract the valid sites we will use in the forthcoming analyses.
+ANGSD can analyse a set of predefined sites, which we can derived from the .mafs.gz file.
+We will discuss these options later.
 
+```
+$ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
+        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 -minMapQ 20 \
+	-minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+        -doMaf 1 -doMajorMinor 1 -GL 1 &> /dev/null
+```	
 
+How many sites?
+```
+zcat Results/ALL.mafs.gz | wc -l
+# 955533
+```
+This number includes the header.
+
+Write the coordinates of these sites in a file. The coordinates are the first 2 columns.
+```
+zcat Results/ALL.mafs.gz | tail -n+2 | cut -f 1,2 > sites.txt
+```
+
+To save some computation time during this tutorial, we will analyse only the first 100k sites.
+Also, ANGSD requires this file to be indexed.
+```
+zcat Results/ALL.mafs.gz | tail -n+2 | cut -f 1,2 | head -n 100000 > sites.txt
+$ANGSD/angsd sites index sites.txt
+```
+Now we can simply tell ANGSD to analyse only these sites using the option `-sites`.
 
 ----------------------------

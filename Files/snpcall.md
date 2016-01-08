@@ -82,7 +82,7 @@ Filedumping:
 From these observations, our command line could be:
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
-        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
         -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
         -GL 1 -doMajorMinor 4 -doMaf 1 -skipTriallelic 1
 ```
@@ -113,19 +113,14 @@ chromo	position	major	minor	ref	knownEM	nInd
 11	61005996	C	A	C	0.000001	46
 11	61005997	C	A	C	0.000001	46
 11	61005998	T	A	T	0.000001	46
-11	61005999	G	A	G	0.000001	46
+11	61005999	G	A	G	0.000000	46
 ```
 
 The first and second column indicate the position of each site, then we have major and minor alleles (based on the reference sequence), the estimated allele frequency, and the number of samples with data.
 
 To see all sites you can type:
 ```
-zcat Results/ALL.mafs.gz | less -S
-```
-
-How many sites are predicted to be polymorphic?
-```
-zcat Results/ALL.mafs.gz | tail -n+2 | wc -l
+less -S Results/ALL.mafs.gz
 ```
 
 To generate this file we used some options in ANGSD, `-GL 1 -doMajorMinor 4 -doMaf 1`.
@@ -153,10 +148,10 @@ As an illustration, let us call SNPs by computing:
 
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
-        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
         -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
         -GL 2 -doMajorMinor 2 -doMaf 2 -skipTriallelic 1 \
-        -minMaf 0.01
+        -minMaf 0.01 &> /dev/null
 ```
 
 You can have a look at the results:
@@ -164,21 +159,21 @@ You can have a look at the results:
 zcat Results/ALL.mafs.gz | head
 
 chromo	position	major	minor	ref	unknownEM	nInd
-11	61006040	G	A	G	0.012236	47
-11	61006070	G	A	G	0.011300	49
-11	61007710	C	G	C	0.020480	56
-11	61015364	G	A	G	0.029304	58
-11	61015729	C	T	C	0.051919	60
-11	61015943	T	C	T	0.029240	59
-11	61016879	C	A	C	0.016451	60
-11	61017056	G	A	A	0.045994	59
-11	61017189	C	T	C	0.029277	59
-
+11	61006040	G	A	G	0.010250	53
+11	61007218	T	C	C	0.444894	58
+11	61007710	C	G	C	0.303258	59
+11	61007781	A	G	G	0.010488	59
+11	61007786	G	T	T	0.025118	59
+11	61007804	T	C	C	0.329408	55
+11	61014040	C	A	C	0.051804	60
+11	61014194	C	T	C	0.014751	59
+11	61014749	A	T	A	0.010908	60
 ```
 
-Hoow many SNPs?
+How many SNPs?
 ```
 zcat Results/ALL.mafs.gz | tail -n+2 | wc -l
+# 512
 ```
 
 As a general guidance, `-GL 1`, `-doMaf 1/2` and `-doMajorMinor 1` should be the preferred choice when data uncertainty is high.
@@ -196,9 +191,9 @@ for PV in 0.05 1e-2 1e-4 1e-6
 do
         if [ $PV == 0.05 ]; then echo SNP_pval NR_SNPs; fi
         $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL.$PV \
-                -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-                -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
-                -GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
+		-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+	        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+              	-GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
                 -SNP_pval $PV &> /dev/null
         echo $PV `zcat Results/ALL.$PV.mafs.gz | tail -n+2 | wc -l`
 done
@@ -207,13 +202,14 @@ done
 A possible output is:
 ```
 SNP_pval NR_SNPs
-0.05 5456
-1e-2 4848
-1e-4 4277
-1e-6 3891
+0.05 670
+1e-2 574
+1e-4 471
+1e-6 410
 ```
 
 Which sites differ from 0.05 and 0.01? What is their frequency?
+This script will also print out the first 20 discordant sites (pK.EM is the p-value for the SNP calling test).
 ```
 Rscript -e 'mafs1=read.table(gzfile("Results/ALL.1e-2.mafs.gz"), he=T, strings=F); mafs5=read.table(gzfile("Results/ALL.0.05.mafs.gz"), header=T, stringsAsFact=F); mafs5[!(mafs5[,2] %in% mafs1[,2]),][1:20,]; pdf(file="Results/diff_snpcall.pdf"); par(mfrow=c(1,2)); hist(as.numeric(mafs5[!(mafs5[,2] %in% mafs1[,2]),][,6]), main="Discordant SNPs", xlab="MAF (DAF)"); hist(as.numeric(mafs5[(mafs5[,2] %in% mafs1[,2]),][,6]), main="Concordant SNPs", xlab="MAF"); dev.off();'
 
@@ -221,5 +217,8 @@ evince Results/diff_snpcall.pdf
 ```
 
 Can you draw some conclusions from these results?
+Which frequencies are more difficult to estimate and therefore affect SNP calling?
+
+
 
 

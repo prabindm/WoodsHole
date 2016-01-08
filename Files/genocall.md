@@ -30,6 +30,9 @@ $ANGSD/angsd -doGeno
 	NB geno_maxDepth requires -doCounts
 ```
 
+Therefore, if we set `-doGeno 2`, genotypes are coded as 0,1,2, as the number of alternate alleles.
+If we want to print the major and minor alleles as well then we set `-doGeno 3`.
+
 To calculate the posterior probability of genotypes we need to define a model.
 ```
 $ANGSD/angsd -doGeno
@@ -43,42 +46,72 @@ $ANGSD/angsd -doGeno
 `-doPost 1` uses the estimate per-site allele frequency as a prior for genotype proportions, assuming Hardy Weinberg Equilibrium.
 We will see later what to do when the assumption of HWE is not valid.
 
-# hwe no filt
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
-        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
-        -GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
-        -SNP_pval 1e-2 \
-        -doGeno 3 -doPost 1 -postCutoff 0 &> /dev/null
+A typical command for genotype calling assuming HWE is:
 
+```
+$ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
+	-sites sites.txt \
+        -GL 1 -doMajorMinor 1 -doMaf 2 -skipTriallelic 1 \
+        -SNP_pval 1e-3 \
+        -doGeno 3 -doPost 1 -postCutoff 0 &> /dev/null
+```
+
+Have a look at the output file:
+```
+less -S Results/ALL.geno.gz
+```
+
+How many sites have at least one missing genotype?
+```
 zcat Results/ALL.geno.gz | grep -1 - | wc -l
 # 0
+```
 
-enotypes are coded as 0,1,2, as the number of alternative alleles.
+Why is that?
 
-# hwe filt
+You can control how to set missing genotype when their confidence is low with `-postCutoff`.
+For instance, we can set as missing genotypes when their (highest) genotype posterior probability is below 0.95:
+
+```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
-        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+	-sites sites.txt \
         -GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
         -SNP_pval 1e-2 \
         -doGeno 3 -doPost 1 -postCutoff 0.95 &> /dev/null
+```
 
+How many sites do we have in total?
+How many sites have at least one missing genotype now?
+```
 zcat Results/ALL.geno.gz | wc -l
-# 12219
+# 574
 zcat Results/ALL.geno.gz | grep -1 - | wc -l
-# 7171
+# 510
+```
 
-# unif filt
+Why are there some many sites with missing genotypes?
+We will deal later with issues when assigning individual genotypes.
+
+If we use a uniform prior, then the command line requires `-doPost 2`:
+
+```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
         -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
         -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
         -GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
         -SNP_pval 1e-2 \
         -doGeno 3 -doPost 2 -postCutoff 0.95 &> /dev/null
+```
 
+How many sites have at least one missing genotype in this case?
+```
 zcat Results/ALL.geno.gz | grep -1 - | wc -l
 # 10904
+```
+
+Did you expect such difference compared to the case of HWE-based prior?
+
+
 
 # investigate some differences? diff file1 file2? then look at postprobs and then eventually to raw data (bam to mpileup) with samtools?
 
