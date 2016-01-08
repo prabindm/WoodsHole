@@ -50,7 +50,8 @@ A typical command for genotype calling assuming HWE is:
 
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
-	-sites sites.txt \
+	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
         -GL 1 -doMajorMinor 1 -doMaf 2 -skipTriallelic 1 \
         -SNP_pval 1e-3 \
         -doGeno 3 -doPost 1 -postCutoff 0 &> /dev/null
@@ -74,7 +75,8 @@ For instance, we can set as missing genotypes when their (highest) genotype post
 
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
-	-sites sites.txt \
+	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
         -GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
         -SNP_pval 1e-2 \
         -doGeno 3 -doPost 1 -postCutoff 0.95 &> /dev/null
@@ -90,7 +92,11 @@ zcat Results/ALL.geno.gz | grep -1 - | wc -l
 ```
 
 Why are there some many sites with missing genotypes?
-We will deal later with issues when assigning individual genotypes.
+The mean depth per sample is around 7/8, therefore genotypes cannot be assigned with very high confidence.
+
+Setting this threshold depends on the mean sequencing depth of your data, as well as your application.
+For some analyses you need to work only with high quality genotypes (e.g. measure of proportion of shared SNPs for gene flow estimate), while for others you can be more relaxed (e.g. estimate of overall nucleotide diversity).
+We will show later how to accurately estimate summary statistics with low-depth data.
 
 If we use a uniform prior, then the command line requires `-doPost 2`:
 
@@ -111,59 +117,33 @@ zcat Results/ALL.geno.gz | grep -1 - | wc -l
 
 Did you expect such difference compared to the case of HWE-based prior?
 
-
-
 # investigate some differences? diff file1 file2? then look at postprobs and then eventually to raw data (bam to mpileup) with samtools?
 
+**ADDITIONAL MATERIAL**
 
-
-Genotypes are coded as 0,1,2, as the number of alternative alleles. 
-
-If we want to print the major and minor allele then we set `-doGeno 3`:
-
-Values coded as -1 represent missing data. Indeed, genotypes with a posterior probability less than a specified threshold are set as missing. 
-You can vary this cutoff by setting the option -postCutoff.
-For instance, if we set `-postCutoff 0`:
-we get
-sites with missing genotypes, while if we are more stringent and use 0.95 as cutoff
-we get
-sites with at least one individual with missing genotype (all!).
-Why is that?
-
-Indeed, the mean depth per sample is around 4, therefore genotypes cannot be assigned with very high confidence.
-
-Setting this threshold depends on the mean sequencing depth of your data, as well as your application. 
-For some analyses you need to work only with high quality genotypes (e.g. measure of proportion of shared SNPs for gene flow estimate), while for others you can be more relaxed (e.g. estimate of overall nucleotide diversity). 
-We will show later how to accurately estimate summary statistics with low-depth data.
-
+The following material is provided as a pure indication, and not all command lines have been tested for compatibility with the most recent version of used programs.
 
 ### Inbred species
 
-**ADDITIONAL MATERIAL**
 For some studies (domesticated or self-pollinated species), it is important to consider any deviation from HWE when performing genotype or SNP calling.
-We provide some command lines ([here](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/inbreeding.md)) to achieve this using ngsTools.
-
+We provide some command lines ([here](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/inbreeding.md)) to achieve this using [ngsF](https://github.com/fgvieira/ngsF).
 
 ### SAMtools
 
-**ADDITIONAL MATERIAL**
 We also provide command lines ([here](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/genocall_samtools.md)) to call genotypes using SAMtools, and to compare results with ANGSD.
-
 
 ### BEAGLE
 
-**ADDITIONAL MATERIAL**
 You can also use BEAGLE to increase accuracy of your genotype calling.
 Several examples using BEAGLE to impute data are given [here](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/imputation.md).
 
 ### FreeBayes
 
 Freebayes is another tool for SNP and Genotype calling, available [here](https://github.com/ekg/freebayes).
-It is especially suitable for indels and CNVs detection.
 
 ### GATK
 
-Alternatively, one can use GATK, which runs slower and requires more steps. Here are commands to generate a VCF file from the previous examples:
+Alternatively, one can use GATK, which runs slower and requires more steps. Here is an example to generate a VCF file:
 ```
 # GATK does not support .gz compressed references
 gunzip ref/hg19.fa.gz
@@ -175,8 +155,6 @@ java -jar CreateSequenceDictionary.jar R= ref/hg19.fa O=ref/hg19.dict
 # zip the file again for safety
 gzip ref/hg19.fa
 ```
-
-Look at the generated VCF file (gatk.vcf). How many SNPs does the program predict?
 
 
 
