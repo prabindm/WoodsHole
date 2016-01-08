@@ -1,133 +1,216 @@
 
 
 **WORKFLOW**:
-... FILTERED DATA > GENOTYPE AND SNP CALLING > POPULATION GENETICS (SFS)
+
+FILTERED DATA > GENOTYPE AND SNP CALLING > POPULATION GENETICS (SFS)
 
 Another important aspect of data analysis for population genetics is the estimate of the Site Frequency Spectrum (SFS). SFS records the proportions of sites at different allele frequencies. It can be folded or unfolded, and the latter case implies the use of an outgroup species to define the ancestral state. SFS is informative on the demography of the population or on selective events (when estimated at a local scale).
 
 We use ANGSD to estimate SFS using on example dataset, using the methods described [here](http://www.ncbi.nlm.nih.gov/pubmed/22911679).
 Details on the implementation can be found [here](http://popgen.dk/angsd/index.php/SFS_Estimation).
 Briefly, from sequencing data one computes genotype likelihoods (as previously described). 
-From these quantities ANGSD computes posterior probabilities of Sample Allele Frequency (SAF), for each site. Finally, an estimate of the SFS is computed.
+From these quantities ANGSD computes posterior probabilities of Sample Allele Frequency (SAF), for each site. 
+Finally, an estimate of the SFS is computed.
 
-Sequence data -> Genotype likelihoods -> Posterior probabilities of SAF -> SFS
+Sequence data -> Genotype likelihoods -> Posterior probabilities of allele frequencies -> SFS
 
-These steps can be accomplished in ANGSD using `-doSaf 1` option and the program `realSFS`, as following:
-```
-ngsTools/angsd/angsd -b input/lyca/bams.list -anc input/lyca/referenceseq.fasta -sites input/lyca/sites.angsd.bed -minMapQ 10 -minQ 10 -GL 1 -doSaf 1 -out output/lyca
-```
-What are the output files?
-```
-ls output/lyca.*
-# output/lyca.arg		output/lyca.saf		output/lyca.saf.pos.gz
-```
-
-File saf.pos summarizes the genomic coordinates of all sites analyzed. 
-```
-gunzip -c output/lyca.saf.pos.gz | head
-```
-File .saf is a binary file, so we use a quick R script to have a look at its contents:
-```
-Rscript scripts/printSAF.R output/lyca.saf 20 99085 0
-```
-
-What do these values represent?
-Let us convert them in proper probabilities.
-```
-Rscript scripts/printSAF.R output/lyca.saf 20 99085 1
-```
-
-Now we can estimate the SFS:
-```
-ngsTools/angsd/misc/realSFS output/lyca.saf 40 -P 2 -nSites 1000000 2> /dev/null > output/lyca.sfs 
-cat output/lyca.sfs
-```
-
-Again `.sfs` file is in log-scale. We can plot it.
-```
-Rscript -e 'sfs=as.numeric(scan("output/lyca.sfs",quiet=T)); sfs=exp(sfs)/sum(exp(sfs));pdf(file="output/lyca.sfs.pdf"); par(mfrow=c(1,2));barplot(sfs,names=0:40,main="SFS"); sfs[1]=NA;sfs=sfs/sum(sfs,na.rm=T); barplot(sfs[2:41],names=1:40,main="SFS",sub="only variable sites");dev.off()';
-```
-It this does not work type:
-```
-Rscript scripts/DoPlotSFS.R
-```
-or open R and type:
-```
-sfs=as.numeric(scan("output/lyca.sfs",quiet=T));
-sfs=exp(sfs)/sum(exp(sfs));
-pdf(file="output/lyca.sfs.pdf");
-par(mfrow=c(1,2));
-barplot(sfs,names=0:40,main="SFS");
-sfs[1]=NA;
-sfs=sfs/sum(sfs,na.rm=T);
-barplot(sfs[2:41],names=1:40,main="SFS",sub="only variable sites");
-dev.off()
-```
+These steps can be accomplished in ANGSD using `-doSaf 1/2` options and the program `realSFS`.
 
 ```
-open output/lyca.sfs.pdf # on mac
-```
-Why is it a bit bumpy?
-
-The method used here does not rely on called genotypes and it is suitable for low-depth data.
-Let us explore the different behaviour using different options. 
-
-We can estimate the SFS using different genotype likelihoods or genotype priors.
-
-```
-ngsTools/angsd/angsd -b input/lyca/bams.list -ref input/lyca/referenceseq.fasta -sites input/lyca/sites.angsd.bed -minMapQ 10 -minQ 10 -GL 1 -doMaf 2 -doMajorMinor 4 -SNP_pval 0.01 -doGeno 2 -doPost 1 -out output/lyca.angsd.v11
-ngsTools/angsd/angsd -b input/lyca/bams.list -ref input/lyca/referenceseq.fasta -sites input/lyca/sites.angsd.bed -minMapQ 10 -minQ 10 -GL 1 -doMaf 2 -doMajorMinor 4 -SNP_pval 0.01 -doGeno 2 -doPost 2 -out output/lyca.angsd.v12
-ngsTools/angsd/angsd -b input/lyca/bams.list -ref input/lyca/referenceseq.fasta -sites input/lyca/sites.angsd.bed -minMapQ 10 -minQ 10 -GL 2 -doMaf 2 -doMajorMinor 4 -SNP_pval 0.01 -doGeno 2 -doPost 1 -out output/lyca.angsd.v21
-ngsTools/angsd/angsd -b input/lyca/bams.list -ref input/lyca/referenceseq.fasta -sites input/lyca/sites.angsd.bed -minMapQ 10 -minQ 10 -GL 2 -doMaf 2 -doMajorMinor 4 -SNP_pval 0.01 -doGeno 2 -doPost 2 -out output/lyca.angsd.v22
-```
-
-Let us plot the results using R. Open it and type
-```
-# function to get the SFS
-getSFS <-function(x){
-  a<-read.table(x)[,-c(1:2)]
-  ns=ncol(a)
-  a[a==-1] <- NA;
-  tot=as.numeric(table(rowSums(a,na.rm=T)))
-  tot/sum(tot)
-}
-
-# read file
-sfs=rbind(getSFS("output/lyca.angsd.v11.geno.gz"), getSFS("output/lyca.angsd.v21.geno.gz"), getSFS("output/lyca.angsd.v12.geno.gz"), getSFS("output/lyca.angsd.v22.geno.gz"))
-
-# let us merge the previous Maximum Likelihood Estimate of SFS
-mle=as.numeric(scan("output/lyca.sfs",quiet=T));
-mle=exp(mle[2:41])/sum(exp(mle[2:41]));
-sfs=rbind(sfs, mle)
-
-# plot
-pdf(file="output/lyca.many.sfs.pdf")
-barplot(sfs, beside=T, legend=c("SAMtools, HWE-prior","GATK, HWE-prior", "SAMtools, no prior", "GATK, no prior", "MLE"))
-dev.off()
-pdf(file="output/lyca.many.zoom.sfs.pdf")
-barplot(sfs[,1:7], beside=T, legend=c("SAMtools, HWE-prior","GATK, HWE-prior", "SAMtools, no prior", "GATK, no prior", "MLE"))
-dev.off()
+$ANGSD/angsd -doSaf
+...
+-doSaf		0
+	1: perform multisample GL estimation
+	2: use an inbreeding version
+	3: calculate genotype probabilities
+	4: Assume genotype posteriors as input (still beta) 
+	-doThetas		0 (calculate thetas)
+	-underFlowProtect	0
+	-fold			0 (deprecated)
+	-anc			(null) (ancestral fasta)
+	-noTrans		0 (remove transitions)
+	-pest			(null) (prior SFS)
+	-isHap			0 (is haploid beta!)
+NB:
+	  If -pest is supplied in addition to -doSaf then the output will then be posterior probability of the sample allelefrequency for each site
 ```
 
-Open the plots
+The SFS is typically computed for each population separately.
+We need to slightly modify the filtering options as now each population has 20 samples. So now we set `-minInd 10 -setMinDepth 70 -setMaxDepth 235`.
+Moreover, we want to estimate the unfolded SFS and we use a putative ancestral sequence to polarise our alleles (in ancestral and derived states).
+
 ```
-open output/lyca.many.sfs.pdf output/lyca.many.zoom.sfs.pdf # on mac
-# evince output/lyca.many.sfs.pdf output/lyca.many.zoom.sfs.pdf 
+for POP in LWK TSI PEL
+do
+        echo $POP
+        $ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/$POP \
+        	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+        	-minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
+        	-GL 1 -doSaf 1 &> /dev/null
+done
 ```
-Do you get similar or different estimates of SFS?
 
+Have a look at the output file.
+```
+$ANGSD/misc/realSFS print Results/LWK.saf.idx | less -S
+```
+These values represent the sample allele frequency likelihoods at each site.
 
-**EXERCISE**
-Compute the SFS on the same dataset after calling SNPs and genotypes, using either ANGSD or SAMtools, by using different thresolds for SNP calling.
-Compare the results.
-A possible **SOLUTION** for this exercise can be found [here](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/solutions.txt).
-Alternatively, estimate the SFS on your dataset or on the example human dataset.
+The next step would be to use these likelihoods and estimate the overall SFS.
+This is achieved by the program `realSFS`.
 
+```
+$ANGSD/misc/realSFS
+	-> ---./realSFS------
+	-> EXAMPLES FOR ESTIMATING THE (MULTI) SFS:
 
-**ADDITIONAL MATERIAL**
-In case of low-depth sequencing data, summary statistics can be computed by keeping statistical uncertainty into account.
-We provide some examples on how to compute summary statistics from low-depth sequencing data using [ANGSD](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/lowcov.md) and [ngsTools](https://github.com/mfumagalli/ngsTools/blob/master/TUTORIAL.md).
+	-> Estimate the SFS for entire genome??
+	-> ./realSFS afile.saf.idx 
 
+	-> 1) Estimate the SFS for entire chromosome 22 ??
+	-> ./realSFS afile.saf.idx -r chr22 
 
+	-> 2) Estimate the 2d-SFS for entire chromosome 22 ??
+	-> ./realSFS afile1.saf.idx  afile2.saf.idx -r chr22 
 
+	-> 3) Estimate the SFS for the first 500megabases (this will span multiple chromosomes) ??
+	-> ./realSFS afile.saf.idx -nSites 500000000 
+
+	-> 4) Estimate the SFS around a gene ??
+	-> ./realSFS afile.saf.idx -r chr2:135000000-140000000 
+
+	-> Other options [-P nthreads -tole tolerence_for_breaking_EM -maxIter max_nr_iterations -bootstrap number_of_replications]
+
+	-> See realSFS print for possible print options
+	-> Use realSFS print_header for printing the header
+
+	->------------------
+	-> NB: Output is now counts of sites instead of log probs!!
+	-> NB: You can print data with ./realSFS print afile.saf.idx !!
+	-> NB: Higher order SFS can be estimated by simply supplying multiple .saf.idx files!!
+	-> NB: Program uses accelerated EM, to use standard EM supply -m 0
+```
+
+This will estimate the SFS for each population
+
+```
+for POP in LWK TSI PEL
+do
+        echo $POP
+        $ANGSD/misc/realSFS Results/$POP.saf.idx 2> /dev/null > Results/$POP.sfs
+done
+```
+
+How many values do you expect?
+```
+cat Results/LWK.sfs
+```
+
+Let us plot the SFS for each pop using this simple R script.
+```
+Rscript Scripts/plotSFS.R Results/LWK.sfs
+evince Results/LWK.sfs.pdf
+```
+
+Now we compare the 3 SFS.
+```
+Rscript Scripts/plotSFS.R Results/LWK.sfs Results/TSI.sfs Results/PEL.sfs
+evince Results/LWK_TSI_PEL.pdf
+```
+Do they behave like expected? 
+Which population has more SNPs?
+Which population has a higher proportion of common (not rare) variants?
+
+It is sometimes convenient to generate bootstrapped replicates of the SFS, by sampling with replacements genomic segments.
+This could be used for instance to get confidence intervals when using the SFS for demographic inferences.
+This can be achieved in ANGSD using:
+```
+$ANGSD/misc/realSFS Results/LWK.saf.idx -bootstrap 10  2> /dev/null > Results/LWK.boots.sfs
+```
+This command may take some time.
+The output file has one line for each boostrapped replicate.
+
+--------------------------
+
+We discussed how this method does not rely on genotype calling.
+How does it compare against methods that assign individual genotypes?
+
+Let us make this test on the TSI data set.
+We now estimate the SFS from called genotypes using either a HWE-based or uniform prior.
+```
+
+$ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_hwe \
+                -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+                -minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
+		-doMaf 2 -SNP_pval 0.01 \
+                -GL 1 -doGeno 2 -doPost 1 -doMajorMinor 5 &> /dev/null
+
+$ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_unif \
+                -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+                -minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
+		-doMaf 2 -SNP_pval 0.01 \
+                -GL 1 -doGeno 2 -doPost 2 -doMajorMinor 5 &> /dev/null
+```
+
+From called genotypes, we can calculate the SFS by summing all observations of derived alleles across sites.
+```
+Rscript Scripts/getSFS.R Results/TSI_hwe.geno.gz > Results/TSI_hwe.sfs
+Rscript Scripts/getSFS.R Results/TSI_unif.geno.gz > Results/TSI_unif.sfs
+```
+Plot the comparison without normalisation but looking at actual counts.
+```
+Rscript Scripts/plotSFS_abs.R Results/TSI.sfs Results/TSI_hwe.sfs Results/TSI_unif.sfs
+evince Results/TSI_TSI_hwe_TSI_unif.pdf
+```
+Comment on what observed.
+
+Based on these considerations, let us compute the SFS without SNP calling.
+
+```
+$ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_hwe \
+                -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+                -minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
+                -GL 1 -doGeno 2 -doPost 1 -doMajorMinor 5 -doMaf 2 &> /dev/null
+
+$ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_unif \
+                -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+                -minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
+                -GL 1 -doGeno 2 -doPost 2 -doMajorMinor 5 -doMaf 2 &> /dev/null
+
+Rscript Scripts/getSFS.R Results/TSI_hwe.geno.gz > Results/TSI_hwe.sfs
+Rscript Scripts/getSFS.R Results/TSI_unif.geno.gz > Results/TSI_unif.sfs
+
+Rscript Scripts/plotSFS_abs.R Results/TSI.sfs Results/TSI_hwe.sfs Results/TSI_unif.sfs
+evince Results/TSI_TSI_hwe_TSI_unif.pdf
+```
+Comment on the result.
+
+-----------------------
+
+It is very useful to estimate a multi-dimensional SFS, for instance the joint SFS between 2 populations (2D).
+This can be used for making inferences on their divergence process (time, migration rate and so on).
+
+An important issue when doing this is to be sure that we are comparing the exactly same corresponding sites between populations.
+ANGSD does that automatically and considers only a set of overlapping sites.
+The 2D-SFS between LWK and TSI is computed with:
+```
+$ANGSD/misc/realSFS -P 4 Results/LWK.saf.idx Results/TSI.saf.idx 2> /dev/null > Results/LWK.TSI.sfs
+```
+
+The output file is a flatten matrix, where each value is the count of sites with the corresponding joint frequency ordered as [0.0] [0.1] and so on.
+```
+less -S Results/LWK.TSI.sfs
+```
+You can plot it, but you need to define how many samples you have per population.
+```
+Rscript Scripts/plot2DSFS.R Results/LWK.TSI.sfs 20 20
+evince Results/LWK.TSI.sfs.pdf
+```
+
+Finally, you can even estimate SFS with higher order of magnitude:
+```
+$ANGSD/misc/realSFS -P 4 Results/LWK.saf.idx Results/TSI.saf.idx Results/PEL.saf.idx 2> /dev/null > Results/LWK.TSI.PEL.sfs
+```
+
+--------------------------------------------------
 
