@@ -251,6 +251,11 @@ Have a look at output file:
 ```
 less -S Results/PEL.thetas.win.txt
 ```
+Columns are:
+ - (indexStart,indexStop)(posStart,posStop)(regStart,regStop) chrom window_center; <br>
+ - 5 estimators of theta: Watterson, pairwise, Fu & Li, Fay H, L; <br>
+ - 5 neutrality test statistics: Tajima D, Fu&Li F, Fu&Li D, Fay H, Zeng E. <br>
+ - The final column is the effetive number of sites with data in the window. <br>
 
 Plot the results:
 ```
