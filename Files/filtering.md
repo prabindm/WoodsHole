@@ -8,17 +8,13 @@ In this section, we will show how to perform a basic filtering of sites, after t
 For most of the examples, we will use the program [ANGSD](http://popgen.dk/wiki/index.php/ANGSD) (Analysis of Next Generation Sequencing Data) developed by Thorfinn Korneliussen and Anders Albrechtsen at the University of Copenhagen. 
 More information about its rationale and implemented methods can be found [here](http://www.ncbi.nlm.nih.gov/pubmed/25420514).
 
-## Data
-
-As an illustration, we will use 60 BAM files of human samples (of African, European, and Native American descent), a reference genome, and putative ancestral sequence.
+We will use 60 BAM files of human samples (of African, European, and Native American descent), a reference genome, and putative ancestral sequence.
 The human data represents a small genomic region (1MB on chromosome 11) extracted from the 1000 Genomes Project data set.
-More information on this project can be found [here](http://www.1000genomes.org/), including their last publication available [here](http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html).
-The human reference sequence can be found [here](ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/).
 
 ## Preparation
 
 Please set the path for all programs and data we will be using.
-
+As an example these are my paths.
 ```
 ANGSD=/data/data/Software/angsd
 SAMTOOLS=/data/data/Software/samtools-1.3
@@ -26,14 +22,12 @@ NGSDIST=/data/Software/ngsDist
 NGSTOOLS=/data/Software/ngsTools
 NGSADMIX=/data/data/Software/NGSadmix/NGSadmix
 FASTME=/data/data/Software/fastme-2.1.4/src/fastme
+```
 
+If you downloaded the data using the provided script, this is what you should specify.
+```
 REF=Data/hs37d5.fa.gz
 ANC=Data/hg19ancNoChr.fa.gz
-```
-
-Create a folder for results.
-```
-mkdir Results
 ```
 
 #### ANGSD

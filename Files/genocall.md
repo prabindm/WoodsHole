@@ -117,7 +117,8 @@ zcat Results/ALL.geno.gz | grep -1 - | wc -l
 
 Did you expect such difference compared to the case of HWE-based prior?
 
-# investigate some differences? diff file1 file2? then look at postprobs and then eventually to raw data (bam to mpileup) with samtools?
+OPTIONAL
+If you want to investigate some differences, you can look at posterior probabilities and eventually to the raw data (BAM and mpileup files) using samtools.
 
 **ADDITIONAL MATERIAL**
 

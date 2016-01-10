@@ -10,12 +10,7 @@ To download all the material in this web page use [git](http://git-scm.com/):
 
 	git clone https://github.com/mfumagalli/EvoGen_course
 
-Enter the folder and create a subfolder "Work" where you will be running the exercises:
-
-	cd WoodsHole
-	mkdir Work
-	cd Work
-	mkdir Results # you results will be saved here
+`Data` and `Results` folder will be created automatically.
 
 ## Data
 
@@ -25,8 +20,11 @@ More information on this project can be found [here](http://www.1000genomes.org/
 
 All data is publicly available.
 A pipeline to retrieve such data is provided [here](https://github.com/mfumagalli/WoodsHole/blob/master/Files/data.md).
+You need to have samtools installed in your /usr/bin to run this.
+Data will be saved (but not pushed to git main repository) in `Data` folder.
 
 Additional scripts are be provided in the `Scripts/` folder.
+
 
 ## Agenda
 
@@ -48,15 +46,5 @@ Additional scripts are be provided in the `Scripts/` folder.
 ## Credits
 
 Some materials have been borrowed (and then adapted) from [Thorfinn Korneliussen](http://scholar.google.co.uk/citations?user=-YNWF4AAAAAJ&hl=en), [Anders Albrechtsen](http://popgen.dk/albrecht/web/WelcomePage.html), [Tyler Linderoth](http://scholar.google.com/citations?user=dTuxmzkAAAAJ&hl=en), [Filipe G. Vieira](http://scholar.google.com/citations?user=gvZmPNQAAAAJ&hl=en), Dean Ousby.
-
-
-
-
- 
-
-
-
-
-
 
 
