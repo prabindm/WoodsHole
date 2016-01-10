@@ -24,7 +24,10 @@ The human data represents a small genomic region (1MB on chromosome 11) extracte
 More information on this project can be found [here](http://www.1000genomes.org/), including their last publication available [here](http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html).
 The human reference sequence can be found [here](ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/).
 
-Additional scripts will be provided.
+All data is publicly available.
+A pipeline to retrieve such data is provided [here](https://github.com/mfumagalli/WoodsHole/blob/master/Files/data.md).
+
+Additional scripts are be provided in the `Scripts/` folder.
 
 ## Agenda
 
@@ -41,11 +44,11 @@ Additional scripts will be provided.
 * Estimation of allele frequencies and [SNP calling](https://github.com/mfumagalli/WoodsHole/blob/master/Files/snpcall.md)
 * [Genotype calling](https://github.com/mfumagalli/WoodsHole/blob/master/Files/genocall.md)
 * Advanced methods to estimate [SFS](https://github.com/mfumagalli/WoodsHole/blob/master/Files/sfs.md)
-* [Exercise]((https://github.com/mfumagalli/WoodsHole/blob/master/Files/fads.md)): identification of allele frequency differentation between, with admixture assessment and quantification, from low-depth data: the case of FADS genetic variation in Native Americans
+* [Exercise]((https://github.com/mfumagalli/WoodsHole/blob/master/Files/exercise.md)): identification of allele frequency differentation between, with admixture assessment and quantification, from low-depth data: the case of FADS genetic variation in Native Americans
 
 ## Credits
 
-Some materials have been borrowed (and then adapted) from [Thorfinn Korneliussen](http://scholar.google.co.uk/citations?user=-YNWF4AAAAAJ&hl=en), [Anders Albrechtsen](http://popgen.dk/albrecht/web/WelcomePage.html), [Tyler Linderoth](http://scholar.google.com/citations?user=dTuxmzkAAAAJ&hl=en), [Filipe G. Vieira](http://scholar.google.com/citations?user=gvZmPNQAAAAJ&hl=en).
+Some materials have been borrowed (and then adapted) from [Thorfinn Korneliussen](http://scholar.google.co.uk/citations?user=-YNWF4AAAAAJ&hl=en), [Anders Albrechtsen](http://popgen.dk/albrecht/web/WelcomePage.html), [Tyler Linderoth](http://scholar.google.com/citations?user=dTuxmzkAAAAJ&hl=en), [Filipe G. Vieira](http://scholar.google.com/citations?user=gvZmPNQAAAAJ&hl=en), Dean Ousby.
 
 
 
