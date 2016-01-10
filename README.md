@@ -7,10 +7,10 @@ Material for Workshop on Population and Speciation Genomics
 ## Material
 
 To download all the material in this web page use [git](http://git-scm.com/):
-
-	git clone https://github.com/mfumagalli/EvoGen_course
-
-`Data` and `Results` folder will be created automatically.
+```
+git clone https://github.com/mfumagalli/WoodsHole
+```
+`Data` and `Results` folder will be created automatically inside the `WoodsHole` folder.
 
 ## Data
 
@@ -24,7 +24,6 @@ You need to have samtools installed in your /usr/bin to run this.
 Data will be saved (but not pushed to git main repository) in `Data` folder.
 
 Additional scripts are be provided in the `Scripts/` folder.
-
 
 ## Agenda
 
