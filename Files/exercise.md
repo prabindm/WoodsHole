@@ -157,7 +157,6 @@ Here we change the filtering (more relaxed) since we are interested in outputtin
 ```
 for POP in LWK TSI PEL
 do
-	if [$POP == PEL] POP=
         echo $POP
         $ANGSD/angsd -P 4 -b $POP_2.bamlist -ref $REF -anc $ANC -out Results/$POP \
                 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \

@@ -3,8 +3,6 @@ Pipeline to download and process the data to be used for this workshop.
 
 ```
 $SAMTOOLS=samtools
-mkdir Data
-mkdir Results
 ```
 
 ```
