@@ -214,3 +214,51 @@ $ANGSD/misc/realSFS -P 4 Results/LWK.saf.idx Results/TSI.saf.idx Results/PEL.saf
 
 --------------------------------------------------
 
+Under the same rationale, summary statistics and indexes of nucleotide diversity can be calculated without relying on called genotypes in ANGSD.
+Briefly, expectations of such statistics are estimated from the sample allele frequency probabilities.
+
+Here we show a typical pipeline, assuming we have already estimate the SFS for each population (see above).
+The pipeline works as follow: 
+-doSaf (likelihoods) -> misc/realSFS (SFS) -> -doSaf (posterior probabilities) -> -doThetas (summary statistics) -> misc/thetaStat (sliding windows)
+
+```
+for POP in LWK TSI PEL
+do
+        echo $POP
+
+        # compute saf posterior probabilities
+        $ANGSD/angsd -P 4 -b $POP.bamlist -ref $ANC -anc $ANC -out Results/$POP \
+        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+        -minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
+        -GL 1 -doSaf 1 \
+        -doThetas 1 -pest Results/$POP.sfs &> /dev/null
+
+        # summary statistics per site
+        $ANGSD/misc/thetaStat make_bed Results/$POP.thetas.gz &> /dev/null
+
+        # sliding windows
+        $ANGSD/misc/thetaStat do_stat Results/$POP.thetas.gz -nChr 11 -win 50000 -step 10000  -outnames Results/$POP.thetas &> /dev/null
+        mv Results/$POP.theta.thetasWindow.gz.pestPG Results/$POP.thetas.win.txt
+
+done
+```
+
+Notes from ANGSD website:
+* Output in the thetas.gz are the log scaled per site estimates of the thetas
+* Output in the pestPG file are the sum of the per site estimates for a region
+
+Have a look at output file:
+```
+less -S Results/PEL.thetas.win.txt
+```
+
+Plot the results:
+```
+Rscript Scripts/plotSS.R
+evince Results/all.ss.pdf
+```
+
+
+
+
+
