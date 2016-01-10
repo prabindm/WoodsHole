@@ -2,10 +2,8 @@
 # get unrelated samples
 Rscript Scripts/getUnrelated.R
 
+echo Retrieving file names...
 NS=20
-
-PHASE3_BAMLIST=`Files/phase3_bamlist.txt`
-
 # get IDs 
 for POP in LWK TSI PEL;
 do
@@ -18,16 +16,15 @@ do
 
 	for i in $INDS;
 	do
-		grep $i PHASE3_BAMLIST >> tmp
+		grep $i Files/phase3_bamlist.txt >> tmp
 	done
 	wc -l tmp
 	head -n $NS tmp > $OUTPUT 
 	rm tmp
 done
 
-
+echo Downloading BAM files...
 # download and index bams
-
 #mkdir Data
 for POP in LWK TSI PEL;
 do
@@ -44,9 +41,6 @@ do
 done
 
 exit
-
-
-
 
 
 

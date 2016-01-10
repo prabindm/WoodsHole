@@ -1,4 +1,6 @@
 
+cat("Extracting unrelated IDs...\n")
+
 fin="/media/mfumagalli/HD/Admixture/20130606_g1k.ped"
 
 sam=read.table(fin, stringsAsFac=F, head=T, sep="\t")

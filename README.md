@@ -6,9 +6,10 @@ Material for Workshop on Population and Speciation Genomics
 
 ## Material
 
-To download all the material in this web page use [git](http://git-scm.com/):
+To download and access all the material in this web page use [git](http://git-scm.com/):
 ```
 git clone https://github.com/mfumagalli/WoodsHole
+cd WoodsHole
 ```
 `Data` and `Results` folder will be created automatically inside the `WoodsHole` folder.
 
