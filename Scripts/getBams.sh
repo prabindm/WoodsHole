@@ -1,7 +1,4 @@
 
-# get unrelated samples
-Rscript Scripts/getUnrelated.R
-
 echo Retrieving file names...
 NS=20
 # get IDs 
@@ -18,7 +15,7 @@ do
 	do
 		grep $i Files/phase3_bamlist.txt >> tmp
 	done
-	wc -l tmp
+	# wc -l tmp
 	head -n $NS tmp > $OUTPUT 
 	rm tmp
 done
@@ -39,6 +36,9 @@ do
 		#samtools index $POP.BAMs/$NAME
 	done
 done
+
+echo Removing index files...
+rm *.bai
 
 exit
 

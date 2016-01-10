@@ -21,7 +21,10 @@ More information on this project can be found [here](http://www.1000genomes.org/
 
 All data is publicly available.
 A pipeline to retrieve such data is provided [here](https://github.com/mfumagalli/WoodsHole/blob/master/Files/data.md).
-You need to have samtools installed in your /usr/bin to run this.
+You need to have 'samtools', 'bgzip' and 'Rscript' installed in your /usr/bin to run this.
+```
+bash Files/data.sh
+```
 Data will be saved (but not pushed to git main repository) in `Data` folder.
 
 Additional scripts are be provided in the `Scripts/` folder.

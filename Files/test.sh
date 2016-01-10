@@ -1,6 +1,6 @@
 
-# IGNORE THIS FILE
-This is only for testing and debugging.
+## IGNORE THIS FILE
+#This is only for testing and debugging.
 
 ## path to programs
 
