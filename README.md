@@ -10,6 +10,7 @@ To download and access all the material in this web page use [git](http://git-sc
 ```
 git clone https://github.com/mfumagalli/WoodsHole
 cd WoodsHole
+# git pull # to be sure you have the latest version, if so you should see "Already up-to-date."
 ```
 `Data` and `Results` folder will be created automatically inside the `WoodsHole` folder.
 
@@ -33,6 +34,7 @@ Additional scripts are be provided in the `Scripts/` folder.
 
 ### Lecture:
 
+Slides are available in [pdf](https://github.com/mfumagalli/WoodsHole/blob/master/Files/slides_wood.md) and [pptx](https://github.com/mfumagalli/WoodsHole/blob/master/Files/slides_wood.pptx) format.
 * Basics of data handling and filtering
 * SNPs and genotypes calling
 * Estimation of summary statistics from low-depth data
