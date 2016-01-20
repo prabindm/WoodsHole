@@ -3,12 +3,17 @@ th=as.numeric(commandArgs(T))
 
 fin="Results/ALL.admix.K3.txt"
 
+th=as.numeric(args[1])
+
+pops=c(args[2], args[3], args[4])
+inds=c(which(pops=="LWK"), which(pops=="TSI"), which(pops=="PEL"))
+rm(pops)
 
 pops=c("AFR", "EUR", "NAM")
 cols=c("blue","red","green")
 
-pops=pops[c(3,1,2)]
-cols=cols[c(3,1,2)]
+pops=pops[inds]
+cols=cols[inds]
 
 pdf(file="Results/ALL.admix.PEL.pdf")
 
