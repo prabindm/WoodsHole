@@ -181,14 +181,16 @@ A possible command line would contain the following filtering:
         -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
 ...
 ```
-which corresponds to the following scenario:
-Parameter | Meaning
---------- | -------
--minInd 30 | use only sites with data from at least N individuals
--setMinDepth 210 | minimum total depth
--setMaxDepth 700 | minimum total depth
+which corresponds to the following scenario: <br>
+Parameter | Meaning <br>
+--------- | ------- <br>
+-minInd 30 | use only sites with data from at least N individuals <br>
+-setMinDepth 210 | minimum total depth <br>
+-setMaxDepth 700 | minimum total depth <br>
 
 ---------------------
+
+OPTIONAL
 
 ANGSD can also compute more sophisticated metrics to filter out SNPs, as described [here](http://popgen.dk/angsd/index.php/SnpFilters), mostly based on:
 
@@ -196,13 +198,16 @@ ANGSD can also compute more sophisticated metrics to filter out SNPs, as describ
 * deviation from HWE
 * quality score bias
 
+The strand bias models are described [here](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3532123/). Some examples of strand biases, taken from the previously cited study, can be found [here](https://github.com/mfumagalli/WoodsHole/blob/master/Files/strand_bias.png).
+Different models are implemented, as seen [here](https://github.com/mfumagalli/WoodsHole/blob/master/Files/strand_bias_eq.png).
+
 These options are still under development and thus they will not be used during this session.
 Furthermore, since our global sample is a mix of populations, the HWE filtering is not appropriate.
 As a general guideline, a typical command line to report SNP statistics is:
 
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
-        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
 	-doMaf 1 -doMajorMinor 1 -GL 1 -SNP_pval 1e-2 -hwe_pval 1 -doSnpStat 1
 ```
@@ -240,7 +245,7 @@ Write the coordinates of these sites in a file. The coordinates are the first 2 
 zcat Results/ALL.mafs.gz | tail -n+2 | cut -f 1,2 > sites.txt
 ```
 
-To save some computation time during this tutorial, we will analyse only the first 100k sites.
+We can also analyse only the first 100k sites.
 Also, ANGSD requires this file to be indexed.
 ```
 zcat Results/ALL.mafs.gz | tail -n+2 | cut -f 1,2 | head -n 100000 > sites.txt

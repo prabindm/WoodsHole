@@ -12,8 +12,8 @@ We will mainly use the program [ANGSD](http://popgen.dk/wiki/index.php/ANGSD) an
 ### Estimating allele frequencies and calling SNPs
 
 One of the first quantities of interest is the identification of which sites are variable, or polymorphic, in our sample.
-This search can be first translated in the estimation of the allele frequency for each site.
-In other words, at each site we want to to estimate (or counts) how many copies of different alleles (2 in case of biallelic SNPs) can be observed in our sample (across all sequenced individuals).
+This search can be firstly translated in the estimation of the allele frequency for each site.
+In other words, at each site we want to to estimate (or count) how many copies of different alleles (two in case of biallelic SNPs) we observe in our sample (across all sequenced individuals).
 
 ANGSD has an option to estimate **allele frequencies**:
 
@@ -83,8 +83,8 @@ From these observations, our command line could be:
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
-        -GL 1 -doMajorMinor 4 -doMaf 1 -skipTriallelic 1
+	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+	-GL 1 -doMajorMinor 4 -doMaf 1 -skipTriallelic 1
 ```
 where we specify:
 * -GL 1: genotype likelihood model is in SAMtools
@@ -126,7 +126,7 @@ less -S Results/ALL.mafs.gz
 To generate this file we used some options in ANGSD, `-GL 1 -doMajorMinor 4 -doMaf 1`.
 To summarise:
 * with `-GL` you can control how to compute genotype likelihoods, which method to use, more info [here](http://popgen.dk/angsd/index.php/Genotype_likelihoods)
-* with -doMajorMinor you can set how to define the 2 allelic states, more info [here](http://popgen.dk/angsd/index.php/Inferring_Major_and_Minor_alleles)
+* with `-doMajorMinor` you can set how to define the two allelic states, more info [here](http://popgen.dk/angsd/index.php/Inferring_Major_and_Minor_alleles)
 * with `-doMaf` you can choose the method to estimate allele frequencies, more info [here](http://popgen.dk/angsd/index.php/Allele_Frequency_estimation).
 
 ------------
@@ -182,6 +182,10 @@ When accurate information on reference sequence or outgroup are available, one c
 Also, detecting variable sites based on their probability of being SNPs is generally a better choice than defining a threshold on the allele frequency.
 However, various cutoffs and a dedicated filtering should be perform to assess robustenss of your called SNPs.
 
+-------------------------
+
+**EXERCISE**
+
 Try varying the cutoff for SNP calling and record how many sites are predicted to be variable for each scenario.
 Identify which sites are not predicted to be variable anymore with a more stringent cutoff (e.g. between a pair of scenario), and plot their allele frequencies.
 
@@ -192,10 +196,10 @@ do
         if [ $PV == 0.05 ]; then echo SNP_pval NR_SNPs; fi
         $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL.$PV \
 		-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-	        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
-              	-GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
-                -SNP_pval $PV &> /dev/null
-        echo $PV `zcat Results/ALL.$PV.mafs.gz | tail -n+2 | wc -l`
+		-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+		-GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
+		-SNP_pval $PV &> /dev/null
+	echo $PV `zcat Results/ALL.$PV.mafs.gz | tail -n+2 | wc -l`
 done
 ```
 
@@ -219,6 +223,14 @@ evince Results/diff_snpcall.pdf
 Can you draw some conclusions from these results?
 Which frequencies are more difficult to estimate and therefore affect SNP calling?
 
+
+### ADDITIONAL MATERIAL
+
+The following material is provided as a pure indication, and not all command lines have been tested for compatibility with the most recent version of used programs.
+
+#### SAMtools
+
+We also provide command lines (here)[https://github.com/mfumagalli/EvoGen_course/blob/master/Files/snpcall_samtools.md0] to call SNPs using SAMtools, and to compare results with ANGSD.
 
 
 

@@ -51,10 +51,10 @@ A typical command for genotype calling assuming HWE is:
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
-        -GL 1 -doMajorMinor 1 -doMaf 2 -skipTriallelic 1 \
-        -SNP_pval 1e-3 \
-        -doGeno 3 -doPost 1 -postCutoff 0 &> /dev/null
+	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+	-GL 1 -doMajorMinor 1 -doMaf 2 -skipTriallelic 1 \
+	-SNP_pval 1e-3 \
+	-doGeno 3 -doPost 1 -postCutoff 0 &> /dev/null
 ```
 
 Have a look at the output file:
@@ -76,10 +76,10 @@ For instance, we can set as missing genotypes when their (highest) genotype post
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
-        -GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
-        -SNP_pval 1e-2 \
-        -doGeno 3 -doPost 1 -postCutoff 0.95 &> /dev/null
+	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+	-GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
+	-SNP_pval 1e-2 \
+	-doGeno 3 -doPost 1 -postCutoff 0.95 &> /dev/null
 ```
 
 How many sites do we have in total?
@@ -92,6 +92,7 @@ zcat Results/ALL.geno.gz | grep -1 - | wc -l
 ```
 
 Why are there some many sites with missing genotypes?
+
 The mean depth per sample is around 7/8, therefore genotypes cannot be assigned with very high confidence.
 
 Setting this threshold depends on the mean sequencing depth of your data, as well as your application.
@@ -117,32 +118,31 @@ zcat Results/ALL.geno.gz | grep -1 - | wc -l
 
 Did you expect such difference compared to the case of HWE-based prior?
 
-OPTIONAL
-If you want to investigate some differences, you can look at posterior probabilities and eventually to the raw data (BAM and mpileup files) using samtools.
+Optionally, if you want to investigate some of these differences more in detail, you can look at posterior probabilities and eventually to the raw data (BAM and mpileup files) using samtools.
 
-**ADDITIONAL MATERIAL**
+###ADDITIONAL MATERIAL
 
 The following material is provided as a pure indication, and not all command lines have been tested for compatibility with the most recent version of used programs.
 
-### Inbred species
+#### Inbred species
 
 For some studies (domesticated or self-pollinated species), it is important to consider any deviation from HWE when performing genotype or SNP calling.
 We provide some command lines ([here](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/inbreeding.md)) to achieve this using [ngsF](https://github.com/fgvieira/ngsF).
 
-### SAMtools
+#### SAMtools
 
 We also provide command lines ([here](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/genocall_samtools.md)) to call genotypes using SAMtools, and to compare results with ANGSD.
 
-### BEAGLE
+#### BEAGLE
 
 You can also use BEAGLE to increase accuracy of your genotype calling.
 Several examples using BEAGLE to impute data are given [here](https://github.com/mfumagalli/EvoGen_course/tree/master/Files/imputation.md).
 
-### FreeBayes
+#### FreeBayes
 
 Freebayes is another tool for SNP and Genotype calling, available [here](https://github.com/ekg/freebayes).
 
-### GATK
+#### GATK
 
 Alternatively, one can use GATK, which runs slower and requires more steps. Here is an example to generate a VCF file:
 ```
