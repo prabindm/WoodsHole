@@ -181,12 +181,22 @@ A possible command line would contain the following filtering:
         -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
 ...
 ```
-which corresponds to the following scenario: <br>
-Parameter | Meaning <br>
---------- | ------- <br>
--minInd 30 | use only sites with data from at least N individuals <br>
--setMinDepth 210 | minimum total depth <br>
--setMaxDepth 700 | minimum total depth <br>
+which corresponds to the following scenario:
+
+Parameter | Meaning |
+--- | --- |
+-minInd 30 | use only sites with data from at least N individuals |
+-setMinDepth 210 | minimum total depth |
+-setMaxDepth 700 | minimum total depth |
+
+-------------------
+
+Finally, for the rest of the analyses on SNP and genotype calling we are going to use only a small fraction of the entire data set, namely only the first 100k sites.
+Typically you can achieve these by setting `-rf` option in ANGSD but since our BAM files do not have a proper header, we have to specify each site we want to analyse, and create a BED file.
+This file can be generated with (knowning that our region is on chromosome 11 from 61M to 62M):
+```
+Rscript -e 'write.table(cbind(rep(11,100000), seq(61000001,61100000,1)), file="sites.txt", sep="\t", quote=F, row.names=F, col.names=F)'
+```
 
 ---------------------
 
@@ -228,9 +238,9 @@ We will discuss these options later.
 
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
-        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 -minMapQ 20 \
+	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 -minMapQ 20 \
 	-minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
-        -doMaf 1 -doMajorMinor 1 -GL 1 &> /dev/null
+	-doMaf 1 -doMajorMinor 1 -GL 1 &> /dev/null
 ```	
 
 How many sites?

@@ -1,7 +1,7 @@
 
 ## CASE STUDY
 
-MOTIVATION
+*MOTIVATION*
 
 Detecting signatures of natural selection in the genome has the twofold meaning of (i) understanding which adaptive processes shaped genetic variation and (ii) identifying putative functional variants.
 In case of humans, biological pathways enriched with selection signatures include pigmentation, immune-system regulation and metabolic processes. 
@@ -14,13 +14,13 @@ Interestingly, selection seems to act on different genes and variants within FAD
 
 Selection acting on FADS genes in Inuit was estimated to start 20k years ago, possibly predating the split between the ancestors of Inuit and Native Americans.
 
-HYPOTHESIS
+*HYPOTHESIS*
 
 Is positive selection on FADS genes targeting Native American populations as well?
 
 If so, is selection acting on the same variants as in Inuit?
 
-PLAN OF ACTION
+*PLAN OF ACTION*
 
 - Retrieve genomic data for American population
 - Check whether the American samples are indeed admixed with Europeans and Africans

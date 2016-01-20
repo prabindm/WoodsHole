@@ -83,7 +83,7 @@ From these observations, our command line could be:
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt\
 	-GL 1 -doMajorMinor 4 -doMaf 1 -skipTriallelic 1
 ```
 where we specify:
@@ -149,8 +149,8 @@ As an illustration, let us call SNPs by computing:
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
-        -GL 2 -doMajorMinor 2 -doMaf 2 -skipTriallelic 1 \
+        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt \
+        -GL 2 -doMajorMinor 2 -doMaf 2 -skipTriallelic 1  \
         -minMaf 0.01 &> /dev/null
 ```
 
@@ -196,7 +196,7 @@ do
         if [ $PV == 0.05 ]; then echo SNP_pval NR_SNPs; fi
         $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL.$PV \
 		-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-		-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+		-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt \
 		-GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
 		-SNP_pval $PV &> /dev/null
 	echo $PV `zcat Results/ALL.$PV.mafs.gz | tail -n+2 | wc -l`

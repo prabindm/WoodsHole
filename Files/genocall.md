@@ -51,7 +51,7 @@ A typical command for genotype calling assuming HWE is:
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt\
 	-GL 1 -doMajorMinor 1 -doMaf 2 -skipTriallelic 1 \
 	-SNP_pval 1e-3 \
 	-doGeno 3 -doPost 1 -postCutoff 0 &> /dev/null
@@ -76,7 +76,7 @@ For instance, we can set as missing genotypes when their (highest) genotype post
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt\
 	-GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
 	-SNP_pval 1e-2 \
 	-doGeno 3 -doPost 1 -postCutoff 0.95 &> /dev/null
@@ -104,7 +104,7 @@ If we use a uniform prior, then the command line requires `-doPost 2`:
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
         -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
+        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt\
         -GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
         -SNP_pval 1e-2 \
         -doGeno 3 -doPost 2 -postCutoff 0.95 &> /dev/null
