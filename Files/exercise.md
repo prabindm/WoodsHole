@@ -132,7 +132,7 @@ We can calculate allele frequencies for only these samples.
 3) Estimate allele frequencies for SNPs in FADS genes of interest
 
 In ANGSD we can restrict our analyses on a subset of positions of interest using the `-sites` option.
-The positions we are looking at are the one found under selection in Inuit, shown [here]((https://github.com/mfumagalli/WoodsHole/blob/master/Files/snps_inuit.png)): 
+The positions we are looking at are the one found under selection in Inuit, shown [here](https://github.com/mfumagalli/WoodsHole/blob/master/Files/snps_inuit.png): 
 - 11 61627960 <br>
 - 11 61631510 <br>
 - 11 61632310 <br>
