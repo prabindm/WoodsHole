@@ -1,5 +1,5 @@
 
-th=as.numeric(commandArgs(T))
+args=commandArgs(T)
 
 fin="Results/ALL.admix.K3.txt"
 
