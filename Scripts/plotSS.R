@@ -5,7 +5,7 @@ win=5e4
 
 fout="Results/all.ss.pdf"
 
-fins=c("Results/LWK.thetas.win.txt", "Results/TSI.thetas.win.txt", "Results/PEL.thetas.win.txt")
+fins=c("Results/LWK.thetas.pestPG", "Results/TSI.thetas.pestPG", "Results/PEL.thetas.pestPG")
 
 theta1 <- read.table(fins[1], fill=TRUE)
 theta2 <- read.table(fins[2], fill=TRUE)

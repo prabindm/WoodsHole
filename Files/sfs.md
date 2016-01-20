@@ -105,15 +105,16 @@ done
 How many values do you expect?
 ```
 cat Results/LWK.sfs
+awk -F' ' '{print NF; exit}' Results/LWK.sfs 
 ```
 
 Let us plot the SFS for each pop using this simple R script.
 ```
 Rscript Scripts/plotSFS.R Results/LWK.sfs
-evince Results/LWK.sfs.pdf
+evince Results/LWK.pdf
 ```
 
-Now we compare the 3 SFS.
+Now we compare the three SFS.
 ```
 Rscript Scripts/plotSFS.R Results/LWK.sfs Results/TSI.sfs Results/PEL.sfs
 evince Results/LWK_TSI_PEL.pdf
@@ -127,6 +128,7 @@ This could be used for instance to get confidence intervals when using the SFS f
 This can be achieved in ANGSD using:
 ```
 $ANGSD/misc/realSFS Results/LWK.saf.idx -bootstrap 10  2> /dev/null > Results/LWK.boots.sfs
+cat Results/LWK.boots.sfs
 ```
 This command may take some time.
 The output file has one line for each boostrapped replicate.
@@ -138,6 +140,9 @@ How does it compare against methods that assign individual genotypes?
 
 Let us make this test on the TSI data set.
 We now estimate the SFS from called genotypes using either a HWE-based or uniform prior.
+Which value for `-doMajorMinor` should we use for a proper comparison?
+
+
 ```
 
 # HWE
@@ -168,7 +173,7 @@ evince Results/TSI_TSI_hwe_TSI_unif.pdf
 Can you make some comments on what observed?
 
 Based on these considerations, let us compute the SFS without SNP calling.
-
+These commands may take some time as they are based on the whole region.
 ```
 $ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_hwe \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
@@ -200,7 +205,7 @@ The 2D-SFS between LWK and TSI is computed with:
 $ANGSD/misc/realSFS -P 4 Results/LWK.saf.idx Results/TSI.saf.idx 2> /dev/null > Results/LWK.TSI.sfs
 ```
 
-The output file is a flatten matrix, where each value is the count of sites with the corresponding joint frequency ordered as [0.0] [0.1] and so on.
+The output file is a flatten matrix, where each value is the count of sites with the corresponding joint frequency ordered as [0,0] [0,1] and so on.
 ```
 less -S Results/LWK.TSI.sfs
 ```
@@ -210,7 +215,10 @@ Rscript Scripts/plot2DSFS.R Results/LWK.TSI.sfs 20 20
 evince Results/LWK.TSI.sfs.pdf
 ```
 
-Finally, you can even estimate SFS with higher order of magnitude:
+OPTIONAL
+
+You can even estimate SFS with higher order of magnitude.
+This command may take some time.
 ```
 $ANGSD/misc/realSFS -P 4 Results/LWK.saf.idx Results/TSI.saf.idx Results/PEL.saf.idx 2> /dev/null > Results/LWK.TSI.PEL.sfs
 ```
@@ -231,7 +239,7 @@ do
         echo $POP
 
         # compute saf posterior probabilities
-        $ANGSD/angsd -P 4 -b $POP.bamlist -ref $ANC -anc $ANC -out Results/$POP \
+        $ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/$POP \
         -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
         -minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
         -GL 1 -doSaf 1 \
@@ -242,7 +250,6 @@ do
 
         # sliding windows
         $ANGSD/misc/thetaStat do_stat Results/$POP.thetas.gz -nChr 11 -win 50000 -step 10000  -outnames Results/$POP.thetas &> /dev/null
-        mv Results/$POP.theta.thetasWindow.gz.pestPG Results/$POP.thetas.win.txt
 
 done
 ```
@@ -253,7 +260,7 @@ Notes from ANGSD website:
 
 Have a look at output file:
 ```
-less -S Results/PEL.thetas.win.txt
+less -S Results/PEL.thetas.pestPG
 ```
 Columns are:
  - (indexStart,indexStop)(posStart,posStop)(regStart,regStop) chrom window_center; <br>
@@ -267,6 +274,9 @@ Rscript Scripts/plotSS.R
 evince Results/all.ss.pdf
 ```
 
+----------------------------
+
+[HOME](https://github.com/mfumagalli/WoodsHole)
 
 
 

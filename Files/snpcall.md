@@ -84,7 +84,7 @@ From these observations, our command line could be:
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt\
-	-GL 1 -doMajorMinor 4 -doMaf 1 -skipTriallelic 1
+	-GL 1 -doMajorMinor 4 -doMaf 1 -skipTriallelic 1 &> /dev/null
 ```
 where we specify:
 * -GL 1: genotype likelihood model is in SAMtools
@@ -149,9 +149,9 @@ As an illustration, let us call SNPs by computing:
 ```
 $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-        -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt \
-        -GL 2 -doMajorMinor 2 -doMaf 2 -skipTriallelic 1  \
-        -minMaf 0.01 &> /dev/null
+	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt \
+	-GL 2 -doMajorMinor 2 -doMaf 2 -skipTriallelic 1  \
+	-minMaf 0.01 &> /dev/null
 ```
 
 You can have a look at the results:
@@ -173,7 +173,6 @@ chromo	position	major	minor	ref	unknownEM	nInd
 How many SNPs?
 ```
 zcat Results/ALL.mafs.gz | tail -n+2 | wc -l
-# 512
 ```
 
 As a general guidance, `-GL 1`, `-doMaf 1/2` and `-doMajorMinor 1` should be the preferred choice when data uncertainty is high.
@@ -203,13 +202,13 @@ do
 done
 ```
 
-A possible output is:
+A possible output is (your numbers may be different):
 ```
 SNP_pval NR_SNPs
-0.05 670
-1e-2 574
-1e-4 471
-1e-6 410
+0.05 384
+1e-2 344
+1e-4 277
+1e-6 241
 ```
 
 Which sites differ from 0.05 and 0.01? What is their frequency?
@@ -230,7 +229,11 @@ The following material is provided as a pure indication, and not all command lin
 
 #### SAMtools
 
-We also provide command lines (here)[https://github.com/mfumagalli/EvoGen_course/blob/master/Files/snpcall_samtools.md0] to call SNPs using SAMtools, and to compare results with ANGSD.
+We also provide command lines [here]9https://github.com/mfumagalli/EvoGen_course/blob/master/Files/snpcall_samtools.md) to call SNPs using SAMtools, and to compare results with ANGSD.
+
+----------------------------
+
+[HOME](https://github.com/mfumagalli/WoodsHole)
 
 
 

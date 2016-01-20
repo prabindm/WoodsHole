@@ -143,6 +143,7 @@ This option means that all sites with depth equal or greater than 1200 will be b
 
 Have a look at the files generated:
 ```
+ls Results/*
 ...
 -> Output filenames:
 		->"Results/ALL.qc.arg"
@@ -193,10 +194,12 @@ Parameter | Meaning |
 
 Finally, for the rest of the analyses on SNP and genotype calling we are going to use only a small fraction of the entire data set, namely only the first 100k sites.
 Typically you can achieve these by setting `-rf` option in ANGSD but since our BAM files do not have a proper header, we have to specify each site we want to analyse, and create a BED file.
-This file can be generated with (knowning that our region is on chromosome 11 from 61M to 62M):
+This file can be generated with (knowning that our region is on chromosome 11 from 61M to 62M) and indexed as:
 ```
 Rscript -e 'write.table(cbind(rep(11,100000), seq(61000001,61100000,1)), file="sites.txt", sep="\t", quote=F, row.names=F, col.names=F)'
+$ANGSD/angsd sites index sites.txt
 ```
+Now we can simply tell ANGSD to analyse only these sites using the option `-sites`.
 
 ---------------------
 
@@ -264,3 +267,6 @@ $ANGSD/angsd sites index sites.txt
 Now we can simply tell ANGSD to analyse only these sites using the option `-sites`.
 
 ----------------------------
+
+[HOME](https://github.com/mfumagalli/WoodsHole)
+

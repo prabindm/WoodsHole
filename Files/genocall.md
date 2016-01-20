@@ -35,7 +35,7 @@ If we want to print the major and minor alleles as well then we set `-doGeno 3`.
 
 To calculate the posterior probability of genotypes we need to define a model.
 ```
-$ANGSD/angsd -doGeno
+$ANGSD/angsd -doPost
 
 ...
 -doPost	0	(Calculate posterior prob 3xgprob)
@@ -65,9 +65,7 @@ less -S Results/ALL.geno.gz
 How many sites have at least one missing genotype?
 ```
 zcat Results/ALL.geno.gz | grep -1 - | wc -l
-# 0
 ```
-
 Why is that?
 
 You can control how to set missing genotype when their confidence is low with `-postCutoff`.
@@ -86,9 +84,7 @@ How many sites do we have in total?
 How many sites have at least one missing genotype now?
 ```
 zcat Results/ALL.geno.gz | wc -l
-# 574
 zcat Results/ALL.geno.gz | grep -1 - | wc -l
-# 510
 ```
 
 Why are there some many sites with missing genotypes?
@@ -113,7 +109,6 @@ $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
 How many sites have at least one missing genotype in this case?
 ```
 zcat Results/ALL.geno.gz | grep -1 - | wc -l
-# 10904
 ```
 
 Did you expect such difference compared to the case of HWE-based prior?
@@ -157,7 +152,9 @@ java -jar CreateSequenceDictionary.jar R= ref/hg19.fa O=ref/hg19.dict
 gzip ref/hg19.fa
 ```
 
+----------------------------
 
+[HOME](https://github.com/mfumagalli/WoodsHole)
 
 
 
