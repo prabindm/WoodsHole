@@ -199,6 +199,10 @@ This file can be generated with (knowning that our region is on chromosome 11 fr
 Rscript -e 'write.table(cbind(rep(11,100000), seq(61000001,61100000,1)), file="sites.txt", sep="\t", quote=F, row.names=F, col.names=F)'
 $ANGSD/angsd sites index sites.txt
 ```
+
+We can speed up random access to files by compressing them (for instance with bgzip in SAMtools). 
+This allow us to quickly seek to a particular part of the file without the need of parsing the whole file. 
+
 Now we can simply tell ANGSD to analyse only these sites using the option `-sites`.
 
 ---------------------
@@ -230,6 +234,10 @@ The output files are:
 less -S Results/ALL.hwe.gz
 less -S Results/ALL.snpStat.gz
 ```
+
+Moreover, additional filtering should be considered.
+For instance transitions (A<->G, C<->T) are more likely than transversions, so we expect the ts/tv ratio to be greater than 0.5.
+Several pipelines for preprocessing of sequencing data are available, for instance [here](https://github.com/MorrellLAB/sequence_handling). 
 
 ----------------------------
 
@@ -265,6 +273,11 @@ zcat Results/ALL.mafs.gz | tail -n+2 | cut -f 1,2 | head -n 100000 > sites.txt
 $ANGSD/angsd sites index sites.txt
 ```
 Now we can simply tell ANGSD to analyse only these sites using the option `-sites`.
+
+--------
+
+People at Ross-Ibarra lab (UC Davis) have developed a suite of programs to run ANGSD.
+This software is called [ANGSD-wrapper](https://github.com/mojaveazure/angsd-wrapper).
 
 ----------------------------
 
