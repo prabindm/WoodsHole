@@ -229,7 +229,7 @@ The following material is provided as a pure indication, and not all command lin
 
 #### SAMtools
 
-We also provide command lines [here]9https://github.com/mfumagalli/EvoGen_course/blob/master/Files/snpcall_samtools.md) to call SNPs using SAMtools, and to compare results with ANGSD.
+We also provide command lines [here](https://github.com/mfumagalli/EvoGen_course/blob/master/Files/snpcall_samtools.md) to call SNPs using SAMtools, and to compare results with ANGSD.
 
 ----------------------------
 
