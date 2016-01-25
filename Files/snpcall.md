@@ -18,7 +18,7 @@ In other words, at each site we want to to estimate (or count) how many copies o
 ANGSD has an option to estimate **allele frequencies**:
 
 ```
-$ANGSD/angsd -doMaf
+angsd -doMaf
 ...
 -doMaf	0 (Calculate persite frequencies '.mafs.gz')
 	1: Frequency (fixed major and minor)
@@ -44,7 +44,7 @@ NB These frequency estimators requires major/minor -doMajorMinor
 
 Therefore, the estimation of allele frequencies requires the specification of how to assign the major and minor alleles (if biallelic).
 ```
-$ANGSD/angsd -doMajorMinor
+angsd -doMajorMinor
 ...
 	-doMajorMinor	0
 	1: Infer major and minor from GL
@@ -58,7 +58,7 @@ $ANGSD/angsd -doMajorMinor
 
 Finally, one needs to specify with genotype likelihood model to use.
 ```
-$ANGSD/angsd -GL
+angsd -GL
 ...
 	-GL=0: 
 	1: SAMtools
@@ -78,10 +78,13 @@ Filedumping:
 	3: binary 3 times likelihood	.glf.gz
 	4: text version (10 log likes)	.glf.gz
 ```
+A description of these different implementation can be found [here](http://www.popgen.dk/angsd/index.php/Genotype_likelihoods).
+The GATK model refers to the first GATK paper (as seen in the lecture), SAMtools is somehow more sophisticated (non-independence of errors), SOAPsnp requires a reference sequence for recalibration of quality scores, SYK is error-type specific.
+For most applications and data, GATK and SAMtools models should give similar results and be preferred.
 
 From these observations, our command line could be:
 ```
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
+angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt\
 	-GL 1 -doMajorMinor 4 -doMaf 1 -skipTriallelic 1 &> /dev/null
@@ -147,7 +150,7 @@ As an illustration, let us call SNPs by computing:
  - SNPs as those having MAF=>0.01.
 
 ```
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
+angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt \
 	-GL 2 -doMajorMinor 2 -doMaf 2 -skipTriallelic 1  \
@@ -193,7 +196,7 @@ Identify which sites are not predicted to be variable anymore with a more string
 for PV in 0.05 1e-2 1e-4 1e-6
 do
         if [ $PV == 0.05 ]; then echo SNP_pval NR_SNPs; fi
-        $ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL.$PV \
+        angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL.$PV \
 		-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 		-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt \
 		-GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \

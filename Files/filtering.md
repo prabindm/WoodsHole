@@ -23,6 +23,7 @@ NGSTOOLS=/data/Software/ngsTools
 NGSADMIX=/data/data/Software/NGSadmix/NGSadmix
 FASTME=/data/data/Software/fastme-2.1.4/src/fastme
 ```
+However, these paths have been sym-linked to your /usr/bin so they can be called by simply typing their name, e.g. `angsd`.
 
 If you downloaded the data using the provided script, this is what you should specify.
 ```
@@ -34,7 +35,7 @@ ANC=Data/hg19ancNoChr.fa.gz
 
 Here we will use ANGSD to analyse our data. To see a full list of options type
 ```
-$ANGSD/angsd
+angsd
 ```
 and you should see something like
 ```
@@ -92,7 +93,7 @@ These filters are based on:
 
 If the input file is in BAM format, the possible options are:
 ```
-$ANGSD/angsd -bam
+angsd -bam
 ...
 ---------------
 parseArgs_bambi.cpp: bam reader:
@@ -133,10 +134,11 @@ However, it is necessary to know the overall distribution of per-site depth, in 
 We first derive the distribution of quality scores and depth on our data set using ```-doQsDist 1 -doDepth 1```.
 
 ```
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL.qc \
+angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL.qc \
         -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
         -doQsDist 1 -doDepth 1 -doCounts 1 -maxDepth 1200
 ```
+`-C 50` reduces the effect of reads with excessive mismatches, while `-baq 1` computes base alignment quality as explained here ([BAQ](http://samtools.sourceforge.net/mpileup.shtml)) used to rule out false SNPs close to INDELS.
 
 As an illustration here, ```-maxDepth 1200``` corresponds to a per-sample average depth of 20.
 This option means that all sites with depth equal or greater than 1200 will be binned together.
@@ -197,7 +199,7 @@ Typically you can achieve these by setting `-rf` option in ANGSD but since our B
 This file can be generated with (knowning that our region is on chromosome 11 from 61M to 62M) and indexed as:
 ```
 Rscript -e 'write.table(cbind(rep(11,100000), seq(61000001,61100000,1)), file="sites.txt", sep="\t", quote=F, row.names=F, col.names=F)'
-$ANGSD/angsd sites index sites.txt
+angsd sites index sites.txt
 ```
 
 We can speed up random access to files by compressing them (for instance with bgzip in SAMtools). 
@@ -207,7 +209,7 @@ Now we can simply tell ANGSD to analyse only these sites using the option `-site
 
 ---------------------
 
-OPTIONAL
+### ADDITIONAL MATERIAL
 
 ANGSD can also compute more sophisticated metrics to filter out SNPs, as described [here](http://popgen.dk/angsd/index.php/SnpFilters), mostly based on:
 
@@ -223,7 +225,7 @@ Furthermore, since our global sample is a mix of populations, the HWE filtering 
 As a general guideline, a typical command line to report SNP statistics is:
 
 ```
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
+angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
 	-doMaf 1 -doMajorMinor 1 -GL 1 -SNP_pval 1e-2 -hwe_pval 1 -doSnpStat 1
@@ -238,41 +240,6 @@ less -S Results/ALL.snpStat.gz
 Moreover, additional filtering should be considered.
 For instance transitions (A<->G, C<->T) are more likely than transversions, so we expect the ts/tv ratio to be greater than 0.5.
 Several pipelines for preprocessing of sequencing data are available, for instance [here](https://github.com/MorrellLAB/sequence_handling). 
-
-----------------------------
-
-OPTIONAL - DO NOT RUN
-
-After we made our filtering choices we can extract the valid sites we will use in the forthcoming analyses.
-ANGSD can analyse a set of predefined sites, which we can derived from the .mafs.gz file.
-We will discuss these options later.
-
-```
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
-	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 -minMapQ 20 \
-	-minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
-	-doMaf 1 -doMajorMinor 1 -GL 1 &> /dev/null
-```	
-
-How many sites?
-```
-zcat Results/ALL.mafs.gz | wc -l
-# 955533
-```
-This number includes the header.
-
-Write the coordinates of these sites in a file. The coordinates are the first 2 columns.
-```
-zcat Results/ALL.mafs.gz | tail -n+2 | cut -f 1,2 > sites.txt
-```
-
-We can also analyse only the first 100k sites.
-Also, ANGSD requires this file to be indexed.
-```
-zcat Results/ALL.mafs.gz | tail -n+2 | cut -f 1,2 | head -n 100000 > sites.txt
-$ANGSD/angsd sites index sites.txt
-```
-Now we can simply tell ANGSD to analyse only these sites using the option `-sites`.
 
 --------
 

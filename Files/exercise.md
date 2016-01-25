@@ -39,7 +39,7 @@ First, compute genotype posterior probabilities for all samples.
  
 ```
 # Assuming HWE, without filtering based on probabilities, with SNP calling
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
+angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
         -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
         -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
         -GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
@@ -61,13 +61,13 @@ cat pops.label
 
 With [ngsDist](https://github.com/fgvieira/ngsDist) we can computer pairwise genetic distances without relying on individual genotype calls.
 ```
-$NGSDIST/ngsDist -verbose 1 -geno Results/ALL.geno.gz -probs -n_ind 60 -n_sites $N_SITES -labels pops.label -o Results/ALL.dist -n_threads 4
+ngsDist -verbose 1 -geno Results/ALL.geno.gz -probs -n_ind 60 -n_sites $N_SITES -labels pops.label -o Results/ALL.dist -n_threads 4
 less -S Results/ALL.dist
 ```
 
 We can visualise the pairwise genetic distances in form of a tree.
 ```
-$FASTME -D 1 -i Results/ALL.dist -o Results/ALL.tree -m b -n b &> /dev/null
+fastme -D 1 -i Results/ALL.dist -o Results/ALL.tree -m b -n b &> /dev/null
 cat Results/ALL.tree
 ```
 
@@ -90,7 +90,7 @@ This is suitable for low-depth data.
 ngsAdmix requires genotype likelihoods in BEAGLE format as input.
 We can compute these quantities with ANGSD with `-doGlf 2`.
 ```
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
+angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
         -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
         -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 \
         -GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
@@ -102,7 +102,7 @@ We assume 3 ancestral populations (Europeans, Africans and Native Americans) mak
 Therefore we compute admixture proportions with 3 ancestral components.
 ```
 K=3
-$NGSADMIX -likes Results/ALL.beagle.gz -K $K -outfiles Results/ALL.admix.K$K -P 4 -minMaf 0.02
+NGSadmix -likes Results/ALL.beagle.gz -K $K -outfiles Results/ALL.admix.K$K -P 4 -minMaf 0.02
 ```
 
 Combine samples IDs with admixture proportions and inspect the results.
@@ -157,7 +157,7 @@ cat snps.txt
 
 We need to index this file in order for ANGSD to process it.
 ```
-$ANGSD/angsd sites index snps.txt
+angsd sites index snps.txt
 ```
 
 We are interested in calculating the derived allele frequencies, so are using the ancestral sequence to polarise the alleles.
@@ -174,7 +174,7 @@ Here we change the filtering (more relaxed) since we are interested in outputtin
 for POP in LWK TSI PEL
 do
         echo $POP
-        $ANGSD/angsd -P 4 -b $POP.sub.bamlist -ref $REF -anc $ANC -out Results/$POP \
+        angsd -P 4 -b $POP.sub.bamlist -ref $REF -anc $ANC -out Results/$POP \
                 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
                 -minMapQ 20 -minQ 20 -minInd 1 -setMinDepth 10 -setMaxDepth 500 -doCounts 1 \
                 -GL 1 -doMajorMinor 5 -doMaf 1 -skipTriallelic 1 \

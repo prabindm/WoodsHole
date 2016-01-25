@@ -17,7 +17,7 @@ Sequence data -> Genotype likelihoods -> Posterior probabilities of allele frequ
 These steps can be accomplished in ANGSD using `-doSaf 1/2` options and the program `realSFS`.
 
 ```
-$ANGSD/angsd -doSaf
+angsd -doSaf
 ...
 -doSaf		0
 	1: perform multisample GL estimation
@@ -44,7 +44,7 @@ Moreover, we want to estimate the unfolded SFS and we use a putative ancestral s
 for POP in LWK TSI PEL
 do
         echo $POP
-        $ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/$POP \
+        angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/$POP \
 		-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 		-minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
 		-GL 1 -doSaf 1 &> /dev/null
@@ -53,7 +53,7 @@ done
 
 Have a look at the output file.
 ```
-$ANGSD/misc/realSFS print Results/LWK.saf.idx | less -S
+realSFS print Results/LWK.saf.idx | less -S
 ```
 These values represent the sample allele frequency likelihoods at each site.
 
@@ -61,7 +61,7 @@ The next step would be to use these likelihoods and estimate the overall SFS.
 This is achieved by the program `realSFS`.
 
 ```
-$ANGSD/misc/realSFS
+realSFS
 	-> ---./realSFS------
 	-> EXAMPLES FOR ESTIMATING THE (MULTI) SFS:
 
@@ -98,7 +98,7 @@ This command will estimate the SFS for each population:
 for POP in LWK TSI PEL
 do
         echo $POP
-        $ANGSD/misc/realSFS Results/$POP.saf.idx 2> /dev/null > Results/$POP.sfs
+        realSFS Results/$POP.saf.idx 2> /dev/null > Results/$POP.sfs
 done
 ```
 
@@ -127,7 +127,7 @@ It is sometimes convenient to generate bootstrapped replicates of the SFS, by sa
 This could be used for instance to get confidence intervals when using the SFS for demographic inferences (as you may seen in the next days).
 This can be achieved in ANGSD using:
 ```
-$ANGSD/misc/realSFS Results/LWK.saf.idx -bootstrap 10  2> /dev/null > Results/LWK.boots.sfs
+realSFS Results/LWK.saf.idx -bootstrap 10  2> /dev/null > Results/LWK.boots.sfs
 cat Results/LWK.boots.sfs
 ```
 This command may take some time.
@@ -146,14 +146,14 @@ Which value for `-doMajorMinor` should we use for a proper comparison?
 ```
 
 # HWE
-$ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_hwe \
+angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_hwe \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
 	-doMaf 2 -SNP_pval 0.01 \
 	-GL 1 -doGeno 2 -doPost 1 -doMajorMinor 5 &> /dev/null
 
 # Uniform
-$ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_unif \
+angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_unif \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
 	-doMaf 2 -SNP_pval 0.01 \
@@ -175,12 +175,12 @@ Can you make some comments on what observed?
 Based on these considerations, let us compute the SFS without SNP calling.
 These commands may take some time as they are based on the whole region.
 ```
-$ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_hwe \
+angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_hwe \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
 	-GL 1 -doGeno 2 -doPost 1 -doMajorMinor 5 -doMaf 2 &> /dev/null
 
-$ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_unif \
+angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/TSI_unif \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
 	-GL 1 -doGeno 2 -doPost 2 -doMajorMinor 5 -doMaf 2 &> /dev/null
@@ -202,7 +202,7 @@ An important issue when doing this is to be sure that we are comparing the exact
 ANGSD does that automatically and considers only a set of overlapping sites.
 The 2D-SFS between LWK and TSI is computed with:
 ```
-$ANGSD/misc/realSFS -P 4 Results/LWK.saf.idx Results/TSI.saf.idx 2> /dev/null > Results/LWK.TSI.sfs
+realSFS -P 4 Results/LWK.saf.idx Results/TSI.saf.idx 2> /dev/null > Results/LWK.TSI.sfs
 ```
 
 The output file is a flatten matrix, where each value is the count of sites with the corresponding joint frequency ordered as [0,0] [0,1] and so on.
@@ -220,7 +220,7 @@ OPTIONAL
 You can even estimate SFS with higher order of magnitude.
 This command may take some time.
 ```
-$ANGSD/misc/realSFS -P 4 Results/LWK.saf.idx Results/TSI.saf.idx Results/PEL.saf.idx 2> /dev/null > Results/LWK.TSI.PEL.sfs
+realSFS -P 4 Results/LWK.saf.idx Results/TSI.saf.idx Results/PEL.saf.idx 2> /dev/null > Results/LWK.TSI.PEL.sfs
 ```
 
 --------------------------------------------------
@@ -239,17 +239,17 @@ do
         echo $POP
 
         # compute saf posterior probabilities
-        $ANGSD/angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/$POP \
-        -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
-        -minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
-        -GL 1 -doSaf 1 \
-        -doThetas 1 -pest Results/$POP.sfs &> /dev/null
+        angsd -P 4 -b $POP.bamlist -ref $REF -anc $ANC -out Results/$POP \
+        	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
+        	-minMapQ 20 -minQ 20 -minInd 10 -setMinDepth 70 -setMaxDepth 235 -doCounts 1 \
+        	-GL 1 -doSaf 1 \
+        	-doThetas 1 -pest Results/$POP.sfs &> /dev/null
 
         # summary statistics per site
-        $ANGSD/misc/thetaStat make_bed Results/$POP.thetas.gz &> /dev/null
+        thetaStat make_bed Results/$POP.thetas.gz &> /dev/null
 
         # sliding windows
-        $ANGSD/misc/thetaStat do_stat Results/$POP.thetas.gz -nChr 11 -win 50000 -step 10000  -outnames Results/$POP.thetas &> /dev/null
+        thetaStat do_stat Results/$POP.thetas.gz -nChr 11 -win 50000 -step 10000  -outnames Results/$POP.thetas &> /dev/null
 
 done
 ```
@@ -273,6 +273,8 @@ Plot the results:
 Rscript Scripts/plotSS.R
 evince Results/all.ss.pdf
 ```
+
+Another program to estimate summary statistics from low-depth data that takes files produced by ANGSD is [ngsTools](https://github.com/mfumagalli/ngsTools).
 
 ----------------------------
 

@@ -9,7 +9,7 @@ We will use ANGSD (and SAMtools as additional material), and compare results usi
 We now see how to use ANGSD to call genotypes.
 The specific option is `-doGeno`:
 ```
-$ANGSD/angsd -doGeno
+angsd -doGeno
 ...
 -doGeno	0
 	1: write major and minor
@@ -35,7 +35,7 @@ If we want to print the major and minor alleles as well then we set `-doGeno 3`.
 
 To calculate the posterior probability of genotypes we need to define a model.
 ```
-$ANGSD/angsd -doPost
+angsd -doPost
 
 ...
 -doPost	0	(Calculate posterior prob 3xgprob)
@@ -49,7 +49,7 @@ We will see later what to do when the assumption of HWE is not valid.
 A typical command for genotype calling assuming HWE is:
 
 ```
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
+angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt\
 	-GL 1 -doMajorMinor 1 -doMaf 2 -skipTriallelic 1 \
@@ -72,7 +72,7 @@ You can control how to set missing genotype when their confidence is low with `-
 For instance, we can set as missing genotypes when their (highest) genotype posterior probability is below 0.95:
 
 ```
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
+angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
 	-uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
 	-minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt\
 	-GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
@@ -98,7 +98,7 @@ We will show later how to accurately estimate summary statistics with low-depth 
 If we use a uniform prior, then the command line requires `-doPost 2`:
 
 ```
-$ANGSD/angsd -P 4 -b ALL.bamlist -ref $ANC -out Results/ALL \
+angsd -P 4 -b ALL.bamlist -ref $REF -out Results/ALL \
         -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -trim 0 -C 50 -baq 1 \
         -minMapQ 20 -minQ 20 -minInd 30 -setMinDepth 210 -setMaxDepth 700 -doCounts 1 -sites sites.txt\
         -GL 1 -doMajorMinor 1 -doMaf 1 -skipTriallelic 1 \
